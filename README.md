@@ -3,12 +3,7 @@ angular-ezdialog
 
 An AngularJS dialog service based on $modal of UI Bootstrap
 
-How to
-------
-You can check the demo [here]().
+Demo
+----
+You can check the demo [here](https://rawgit.com/eight04/angular-ezdialog/dev/example.html).
 
-CDN
----
-```
-//cdn.rawgit.com/eight04/angular-ezdialog/master/dialog.js"></script>
-```
