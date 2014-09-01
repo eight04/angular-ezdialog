@@ -1,5 +1,21 @@
 angular.module("ezdialog", ["ui.bootstrap"])
 	.factory("ezdialog", function($modal){
+		var conf = {
+			btn: {
+				ok: "OK",
+				cancel: "Cancel",
+				yes: "Yes",
+				no: "No"
+			},
+			title: {
+				show: "Info",
+				confirm: "Confirm",
+				yesno: "Confirm",
+				error: "Error"
+			},
+			size: 'sm',
+			backdrop: 'static'
+		};
 	
 		function dialog(opt){
 			var onclose = null, callback = {};
@@ -8,7 +24,7 @@ angular.module("ezdialog", ["ui.bootstrap"])
 				templateUrl: opt.template || null,
 				template: 
 					opt.template ? null :
-						'<div class="{{type}}">\
+						'<div class="modal-{{type}}">\
 							<div class="modal-header">\
 								<h3 class="modal-title">{{title}}</h3>\
 							</div>\
@@ -16,8 +32,8 @@ angular.module("ezdialog", ["ui.bootstrap"])
 								<span style="white-space: pre-wrap;">{{body}}</span>\
 							</div>\
 							<div class="modal-footer">\
-								<button class="btn btn-primary" ng-click="ok()" type="button" ng-show="yes">{{yes}}</button>\
-								<button class="btn btn-default" ng-click="cancel()" type="button" ng-show="no">{{no}}</button>\
+								<button class="btn btn-{{type}}" ng-click="ok()" type="button" ng-show="yes!==undefined">{{yes}}</button>\
+								<button class="btn btn-default" ng-click="cancel()" type="button" ng-show="no!==undefined">{{no}}</button>\
 							</div>\
 						</div>',
 				controller: "dialog",
@@ -29,8 +45,8 @@ angular.module("ezdialog", ["ui.bootstrap"])
 						return callback;
 					}
 				},
-				size: opt.size || "sm",
-				backdrop: "static"
+				size: opt.size || conf.size,
+				backdrop: opt.backdrop || conf.backdrop
 			}).result.then(function(value){
 				if (onclose) {
 					onclose(value);
@@ -65,41 +81,41 @@ angular.module("ezdialog", ["ui.bootstrap"])
 			};
 		}
 		
-		function error(msg){
+		function error(msg, title){
 			return dialog({
-				title: "Error",
+				title: title || conf.title.error,
 				msg: msg,
-				yes: "確定",
-				type: "error"
+				yes: conf.btn.ok,
+				type: "danger"
 			});
 		}
 		
-		function confirm(msg){
+		function confirm(msg, title){
 			return dialog({
-				title: "Confirm",
+				title: title || conf.title.confirm,
 				msg: msg,
-				yes: "確定",
-				no: "取消",
-				type: "confirm"
+				yes: conf.btn.ok,
+				no: conf.btn.cancel,
+				type: "primary"
 			});
 		}
 			
-		function yesno(msg){
+		function yesno(msg, title){
 			return dialog({
-				title: "Confirm",
+				title: title || conf.title.yesno,
 				msg: msg,
-				yes: "是",
-				no: "否",
-				type: "confirm"
+				yes: conf.btn.yes,
+				no: conf.btn.no,
+				type: "primary"
 			});
 		}
 		
-		function show(msg){
+		function show(msg, title){
 			return dialog({
-				title: "Info",
+				title: title || conf.title.show,
 				msg: msg,
-				yes: "確定",
-				type: "info"
+				yes: conf.btn.ok,
+				type: "primary"
 			});
 		}
 		
@@ -107,12 +123,18 @@ angular.module("ezdialog", ["ui.bootstrap"])
 			return dialog(opt);
 		}
 		
+		function setConf(opt){
+			angular.extend(conf, opt);
+			return this;
+		}
+		
 		return {
 			error: error,
 			confirm: confirm,
 			yesno: yesno,
 			show: show,
-			create: create
+			create: create,
+			conf: setConf
 		};
 	})
 	.controller("dialog", function($scope, $modalInstance, $http, opt, callback){

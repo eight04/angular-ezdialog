@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="tw" ng-app="App">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.23/angular.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.11.0/ui-bootstrap-tpls.min.js"></script>
+	<script src="dialog.js"></script>
+	<script>
+		angular.module("App", ["ui.bootstrap", "ezdialog"]).controller("main", function($scope, ezdialog){
+			$scope.dialog = ezdialog;
+			
+			$scope.twConf = {
+				btn: {
+					ok: "確定",
+					cancel: "取消",
+					yes: "是",
+					no: "否"
+				},
+				title: {
+					show: "訊息",
+					confirm: "確認",
+					yesno: "確認",
+					error: "錯誤"
+				},
+				size: "md"
+			};
+		});
+	</script>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+	<link rel="stylesheet" href="dialog.css">
+</head>
+<body ng-controller="main">
+	<button class="btn btn-default" ng-click="dialog.show('easy!')">Show</button>
+	<button class="btn btn-default" ng-click="dialog.show('easy!', 'Custom Title')">Show with title</button>
+	<button class="btn btn-default" ng-click="dialog.confirm('easy!')">Confirm</button>
+	<button class="btn btn-default" ng-click="dialog.yesno('easy!')">Yes/No</button>
+	<button class="btn btn-default" ng-click="dialog.error('easy!')">Error</button>
+	<button class="btn btn-default" ng-click="dialog.conf(twConf).show('Default conf changed!')">Change Default Conf</button>
+</body>
+</html>
