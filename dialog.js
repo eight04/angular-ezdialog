@@ -61,6 +61,7 @@ angular.module("ezdialog", ["ui.bootstrap"])
 			
 			function close(func){
 				onclose = func;
+				
 				return this;
 			}
 			
