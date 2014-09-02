@@ -1,5 +1,5 @@
 angular.module("ezdialog", ["ui.bootstrap"])
-	.factory("ezdialog", function($modal){
+	.factory("ezdialog", function($http, $templateCache, $modal){
 		var conf = {
 			btn: {
 				ok: "OK",
@@ -22,24 +22,35 @@ angular.module("ezdialog", ["ui.bootstrap"])
 			size: 'sm',
 			backdrop: 'static'
 		};
+		
+		var template = '\
+			<div class="modal-header">\
+				<h3 class="modal-title">{{title}}</h3>\
+			</div>\
+			<div class="modal-body">\
+				<span style="white-space: pre-wrap;" ng-if="!templateLoaded">{{body}}</span>\
+				<ng-include src="template" onload="templateLoaded=true">XXX</ng-include>\
+			</div>\
+			<div class="modal-footer">\
+				<button class="btn btn-{{type}}" ng-click="ok()" type="button" ng-if="yes!==undefined">{{yes}}</button>\
+				<button class="btn btn-default" ng-click="cancel()" type="button" ng-if="no!==undefined">{{no}}</button>\
+			</div>';
 	
 		function dialog(opt){
 			var onclose = null, callback = {}, instance;
 			
+			if (opt.template) {
+				$http.get(opt.template, {
+					cache: $templateCache
+				}).then(function(result){
+					var body = result.data;
+					if (body) {
+					
+					}
+				});
+			}
 			instance = $modal.open({
-				templateUrl: opt.template || null,
-				template: 
-					opt.template ? null :
-						'<div class="modal-header">\
-							<h3 class="modal-title">{{title}}</h3>\
-						</div>\
-						<div class="modal-body">\
-							<span style="white-space: pre-wrap;">{{body}}</span>\
-						</div>\
-						<div class="modal-footer">\
-							<button class="btn btn-{{type}}" ng-click="ok()" type="button" ng-if="yes!==undefined">{{yes}}</button>\
-							<button class="btn btn-default" ng-click="cancel()" type="button" ng-if="no!==undefined">{{no}}</button>\
-						</div>',
+				template: template,
 				controller: "dialog",
 				resolve: {
 					opt: function(){
@@ -175,6 +186,7 @@ angular.module("ezdialog", ["ui.bootstrap"])
 		$scope.type = opt.type || "default";
 		$scope.title = opt.title;
 		$scope.param = opt.param;
+		$scope.template = opt.template;
 		
 		$scope.ok = function(){
 			$modalInstance.close(true);
