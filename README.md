@@ -58,7 +58,7 @@ ezdialog.show({
 	no: "and this is no button text"
 });
 
-// Use a custom template.
+// Use a custom template. This may change in the future.
 var param = ["wat?", "param", "will be", "assign on", "$scope"];
 ezdialog.show({
 	template: "my-dialog.html",
