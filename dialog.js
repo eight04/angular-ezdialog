@@ -24,23 +24,21 @@ angular.module("ezdialog", ["ui.bootstrap"])
 		};
 	
 		function dialog(opt){
-			var onclose = null, callback = {};
+			var onclose = null, callback = {}, instance;
 			
-			$modal.open({
+			instance = $modal.open({
 				templateUrl: opt.template || null,
 				template: 
 					opt.template ? null :
-						'<div class="modal-{{type}}">\
-							<div class="modal-header">\
-								<h3 class="modal-title">{{title}}</h3>\
-							</div>\
-							<div class="modal-body">\
-								<span style="white-space: pre-wrap;">{{body}}</span>\
-							</div>\
-							<div class="modal-footer">\
-								<button class="btn btn-{{type}}" ng-click="ok()" type="button" ng-if="yes!==undefined">{{yes}}</button>\
-								<button class="btn btn-default" ng-click="cancel()" type="button" ng-if="no!==undefined">{{no}}</button>\
-							</div>\
+						'<div class="modal-header">\
+							<h3 class="modal-title">{{title}}</h3>\
+						</div>\
+						<div class="modal-body">\
+							<span style="white-space: pre-wrap;">{{body}}</span>\
+						</div>\
+						<div class="modal-footer">\
+							<button class="btn btn-{{type}}" ng-click="ok()" type="button" ng-if="yes!==undefined">{{yes}}</button>\
+							<button class="btn btn-default" ng-click="cancel()" type="button" ng-if="no!==undefined">{{no}}</button>\
 						</div>',
 				controller: "dialog",
 				resolve: {
@@ -52,8 +50,11 @@ angular.module("ezdialog", ["ui.bootstrap"])
 					}
 				},
 				size: opt.size || conf.size,
-				backdrop: opt.backdrop || conf.backdrop
-			}).result.then(function(value){
+				backdrop: opt.backdrop !== undefined ? opt.backdrop : conf.backdrop,
+				windowClass: opt.type?"modal-" + opt.type:null
+			});
+			
+			instance.result.then(function(value){
 				if (onclose) {
 					onclose(value);
 				}
@@ -84,7 +85,8 @@ angular.module("ezdialog", ["ui.bootstrap"])
 				close: close,
 				ok: ok,
 				cencel: cancel,
-				callback: addCallback
+				callback: addCallback,
+				instance: instance
 			};
 		}
 		
