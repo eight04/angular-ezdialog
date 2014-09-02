@@ -29,6 +29,24 @@
 				},
 				size: "md"
 			};
+			
+			$scope.customDialog = function(){
+				ezdialog.create({
+					msg: "ezdialog.create(options)",
+					title: "Ya!",
+					size: "lg",
+					yes: "yes yes yes!",
+					type: "primary"
+				}).close(task2);
+				
+				function task2(){
+					ezdialog.create().close(task3);
+				}
+				
+				function task3(){
+					
+				}
+			};
 		});
 	</script>
 </head>
@@ -39,5 +57,6 @@
 	<button class="btn btn-default" ng-click="dialog.yesno('easy!')">Yes/No</button>
 	<button class="btn btn-default" ng-click="dialog.error('easy!')">Error</button>
 	<button class="btn btn-default" ng-click="dialog.conf(twConf).show('Default conf changed!')">Change Default Conf</button>
+	<button class="btn btn-default" ng-click="customDialog()">User Defined</button>
 </body>
 </html>

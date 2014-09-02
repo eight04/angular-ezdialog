@@ -13,6 +13,12 @@ angular.module("ezdialog", ["ui.bootstrap"])
 				yesno: "Confirm",
 				error: "Error"
 			},
+			msg: {
+				show: "Hi!",
+				confirm: "Are you sure?",
+				yesno: "Yes or no?",
+				error: "An error occurred!"
+			},
 			size: 'sm',
 			backdrop: 'static'
 		};
@@ -32,8 +38,8 @@ angular.module("ezdialog", ["ui.bootstrap"])
 								<span style="white-space: pre-wrap;">{{body}}</span>\
 							</div>\
 							<div class="modal-footer">\
-								<button class="btn btn-{{type}}" ng-click="ok()" type="button" ng-show="yes!==undefined">{{yes}}</button>\
-								<button class="btn btn-default" ng-click="cancel()" type="button" ng-show="no!==undefined">{{no}}</button>\
+								<button class="btn btn-{{type}}" ng-click="ok()" type="button" ng-if="yes!==undefined">{{yes}}</button>\
+								<button class="btn btn-default" ng-click="cancel()" type="button" ng-if="no!==undefined">{{no}}</button>\
 							</div>\
 						</div>',
 				controller: "dialog",
@@ -82,44 +88,65 @@ angular.module("ezdialog", ["ui.bootstrap"])
 		}
 		
 		function error(msg, title){
-			return dialog({
+			var opt = {
 				title: title || conf.title.error,
-				msg: msg,
+				msg: msg || conf.msg.error,
 				yes: conf.btn.ok,
 				type: "danger"
-			});
+			};
+			if (typeof msg == "object") {
+				opt.msg = conf.msg.error;
+				angular.extend(opt, msg);
+			}
+			return dialog(opt);
 		}
 		
 		function confirm(msg, title){
-			return dialog({
+			var opt = {
 				title: title || conf.title.confirm,
-				msg: msg,
+				msg: msg || conf.msg.confirm,
 				yes: conf.btn.ok,
 				no: conf.btn.cancel,
 				type: "primary"
-			});
+			};
+			if (typeof msg == "object") {
+				opt.msg = conf.msg.confirm;
+				angular.extend(opt, msg);
+			}
+			return dialog(opt);
 		}
 			
 		function yesno(msg, title){
-			return dialog({
+			var opt = {
 				title: title || conf.title.yesno,
-				msg: msg,
+				msg: msg || conf.msg.yesno,
 				yes: conf.btn.yes,
 				no: conf.btn.no,
 				type: "primary"
-			});
+			};
+			if (typeof msg == "object") {
+				opt.msg = conf.msg.yesno;
+				angular.extend(opt, msg);
+			}
+			return dialog(opt);
 		}
 		
 		function show(msg, title){
-			return dialog({
+			var opt = {
 				title: title || conf.title.show,
-				msg: msg,
+				msg: msg || conf.msg.show,
 				yes: conf.btn.ok,
 				type: "primary"
-			});
+			};
+			if (typeof msg == "object") {
+				opt.msg = conf.msg.show;
+				angular.extend(opt, msg);
+			}
+			return dialog(opt);
 		}
 		
 		function create(opt){
+			// raw dialog
 			return dialog(opt);
 		}
 		
@@ -142,7 +169,7 @@ angular.module("ezdialog", ["ui.bootstrap"])
 		$scope.body = opt.msg;
 		$scope.yes = opt.yes;
 		$scope.no = opt.no;
-		$scope.type = opt.type;
+		$scope.type = opt.type || "default";
 		$scope.title = opt.title;
 		$scope.param = opt.param;
 		
