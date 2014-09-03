@@ -23,32 +23,24 @@ angular.module("ezdialog", ["ui.bootstrap"])
 			backdrop: 'static'
 		};
 		
-		var template = '\
-			<div class="modal-header">\
-				<h3 class="modal-title">{{title}}</h3>\
-			</div>\
-			<div class="modal-body">\
-				<span style="white-space: pre-wrap;" ng-if="!templateLoaded">{{body}}</span>\
-				<ng-include src="template" onload="templateLoaded=true">XXX</ng-include>\
-			</div>\
-			<div class="modal-footer">\
-				<button class="btn btn-{{type}}" ng-click="ok()" type="button" ng-if="yes!==undefined">{{yes}}</button>\
-				<button class="btn btn-default" ng-click="cancel()" type="button" ng-if="no!==undefined">{{no}}</button>\
-			</div>';
+		var template = 
+			'<form role="form">\
+				<div class="modal-header">\
+					<h3 class="modal-title">{{title}}</h3>\
+				</div>\
+				<div class="modal-body">\
+					<span style="white-space: pre-wrap;" ng-if="!templateLoaded">{{body}}</span>\
+					<ng-include src="template" onload="templateLoaded=true">XXX</ng-include>\
+				</div>\
+				<div class="modal-footer">\
+					<button class="btn btn-{{type}}" ng-click="ok()" type="submit" ng-if="yes!==undefined">{{yes}}</button>\
+					<button class="btn btn-default" ng-click="cancel()" type="button" ng-if="no!==undefined">{{no}}</button>\
+				</div>\
+			</form>';
 	
 		function dialog(opt){
 			var onclose = null, callback = {}, instance;
 			
-			if (opt.template) {
-				$http.get(opt.template, {
-					cache: $templateCache
-				}).then(function(result){
-					var body = result.data;
-					if (body) {
-					
-					}
-				});
-			}
 			instance = $modal.open({
 				template: template,
 				controller: "dialog",
