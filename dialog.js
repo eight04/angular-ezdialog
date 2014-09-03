@@ -26,15 +26,15 @@ angular.module("ezdialog", ["ui.bootstrap"])
 		var template = 
 			'<form role="form">\
 				<div class="modal-header">\
-					<h3 class="modal-title">{{title}}</h3>\
+					<h3 class="modal-title">{{ez.title}}</h3>\
 				</div>\
 				<div class="modal-body">\
-					<span style="white-space: pre-wrap;" ng-if="!templateLoaded">{{body}}</span>\
-					<ng-include src="template" onload="templateLoaded=true">XXX</ng-include>\
+					<span style="white-space: pre-wrap;" ng-if="!ez.templateLoaded">{{ez.body}}</span>\
+					<ng-include src="ez.template" onload="ez.templateLoaded=true"></ng-include>\
 				</div>\
 				<div class="modal-footer">\
-					<button class="btn btn-{{type}}" ng-click="ok()" type="submit" ng-if="yes!==undefined">{{yes}}</button>\
-					<button class="btn btn-default" ng-click="cancel()" type="button" ng-if="no!==undefined">{{no}}</button>\
+					<button class="btn btn-{{ez.type}}" ng-click="ez.callback.ok()" type="submit" ng-if="ez.btn.yes!==undefined">{{ez.btn.yes}}</button>\
+					<button class="btn btn-default" ng-click="ez.callback.cancel()" type="button" ng-if="ez.btn.no!==undefined">{{ez.btn.no}}</button>\
 				</div>\
 			</form>';
 	
@@ -172,25 +172,28 @@ angular.module("ezdialog", ["ui.bootstrap"])
 	})
 	.controller("dialog", function($scope, $modalInstance, $http, opt, callback){
 		
-		$scope.body = opt.msg;
-		$scope.yes = opt.yes;
-		$scope.no = opt.no;
-		$scope.type = opt.type || "default";
-		$scope.title = opt.title;
-		$scope.param = opt.param;
-		$scope.template = opt.template;
-		
-		$scope.ok = function(){
-			$modalInstance.close(true);
-		};
-		
-		$scope.cancel = function(){
-			$modalInstance.close(false);
-		};		
+		$scope.ez = {
+			btn: {
+				yes: opt.yes,
+				no: opt.no
+			},
+			body: opt.msg,
+			type: opt.type || "default",
+			title: opt.title,
+			template: opt.template,
+			callback: {
+				ok: function(){
+					$modalInstance.close(true);
+				},
+				cancel: function(){
+					$modalInstance.close(false);
+				}
+			}
+		}
 		
 		for (var i in callback) {
 			if (typeof callback[i] == "function") {
-				$scope[i] = callback[i].bind($modalInstance);
+				$scope.ez.callback[i] = callback[i].bind($modalInstance, $scope);
 			}
 		}
 	});
