@@ -55,14 +55,14 @@
 	<button class="btn btn-default" ng-click="timeout()">Timeout</button>
 	
 	<h3>Use custom template</h3>
-	<button class="btn btn-default" ng-click="dialog.show({template: 'template.html'})">Custom dialog</button>
+	<button class="btn btn-default" ng-click="dialog.show({template: 'template.html', param: {number: 999}})">Custom dialog</button>
 	<button class="btn btn-default" ng-click="dialog.show({template: 'template2.html'})">With http request</button>
 	<button class="btn btn-default" ng-click="dialog.show({msg: 'loading failed!', template: 'not-exist.html'})">Load error</button>
 	
 	<script type="text/ng-template" id="template.html">
 		<p>Custom template! This will be include in modal body.</p>
 		<pre>$scope.ez = {{ez}}</pre>
-		<input type="text" class="form-control" autofocus>
+		<input type="text" class="form-control" autofocus ng-model="param.number">
 	</script>
 </body>
 </html>

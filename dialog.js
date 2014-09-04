@@ -194,6 +194,8 @@ angular.module("ezdialog", ["ui.bootstrap"])
 				}
 			};
 			
+			$scope.param = opt.param;
+			
 			for (var i in callback) {
 				if (typeof callback[i] == "function") {
 					$scope.ez.callback[i] = callback[i].bind($modalInstance, $scope);
