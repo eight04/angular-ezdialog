@@ -1,0 +1,26 @@
+{
+  "name": "angular-ezdialog",
+  "version": "1.0.4",
+  "homepage": "https://github.com/eight04/angular-ezdialog",
+  "authors": [
+    "eight <eight04@gmail.com>"
+  ],
+  "description": "An simple AngularJS dialog service based on $modal of UI Bootstrap.",
+  "main": ["dialog.js", "dialog.css"],
+  "moduleType": [
+    "globals"
+  ],
+  "keywords": [
+    "angular",
+    "dialog"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests",
+	"example"
+  ]
+}
