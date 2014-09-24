@@ -27,7 +27,7 @@ angular.module("ezdialog", ["ui.bootstrap"])
 		};
 		
 		var template = 
-			'<form role="form">\
+			'<form role="form" name="dialog">\
 				<div class="modal-header">\
 					<h3 class="modal-title">{{ez.title}}</h3>\
 				</div>\
@@ -36,7 +36,7 @@ angular.module("ezdialog", ["ui.bootstrap"])
 					<ng-include src="ez.template" onload="ez.templateLoaded=true"></ng-include>\
 				</div>\
 				<div class="modal-footer">\
-					<button class="btn btn-{{ez.type}}" ng-click="ez.callback.ok()" type="submit" ng-if="ez.btn.yes!==undefined">{{ez.btn.yes}}</button>\
+					<button class="btn btn-{{ez.type}}" ng-click="ez.callback.ok()" type="submit" ng-if="ez.btn.yes!==undefined" ng-disabled="dialog.$invalid">{{ez.btn.yes}}</button>\
 					<button class="btn btn-default" ng-click="ez.callback.cancel()" type="button" ng-if="ez.btn.no!==undefined">{{ez.btn.no}}</button>\
 				</div>\
 			</form>';

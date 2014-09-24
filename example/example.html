@@ -6,12 +6,17 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.23/angular.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.11.0/ui-bootstrap-tpls.min.js"></script>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+	
+	<script src="https://code.angularjs.org/1.2.25/angular-animate.js"></script>
 
 	<script src="../dialog.js"></script>
 	<link rel="stylesheet" href="../dialog.css">
 	
 	<script>
-		angular.module("App", ["ui.bootstrap", "ezdialog"]).controller("main", function($scope, ezdialog, $timeout){
+		angular.module("App", ["ui.bootstrap", "ezdialog"]).controller("main", function($scope, ezdialog, $timeout, $animate){
+			$animate.enabled("off");
+			console.log($animate);
+		
 			$scope.dialog = ezdialog;
 			
 			$scope.showRet = function(ret){
@@ -62,7 +67,7 @@
 	<script type="text/ng-template" id="template.html">
 		<p>Custom template! This will be include in modal body.</p>
 		<pre>$scope.ez = {{ez}}</pre>
-		<input type="text" class="form-control" autofocus ng-model="param.number">
+		<input type="text" class="form-control" autofocus ng-model="param.number" required>
 	</script>
 </body>
 </html>
