@@ -1,7 +1,7 @@
 angular-ezdialog
 ================
 
-An simple AngularJS dialog service based on $modal of UI Bootstrap
+A simple AngularJS dialog service based on $modal of UI Bootstrap
 
 Demo
 ----
