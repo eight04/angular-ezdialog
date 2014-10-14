@@ -2,6 +2,57 @@
 /* eslint eqeqeq: 0, quotes: 0, no-multi-str: 0 */
 
 angular.module("ezdialog", ["ui.bootstrap"])
+	.directive("ezdialogBackdrop", function(ezdialogStack){
+		return {
+			restrict: "E",
+			template: '<div class="modal-backdrop" ng-style="{\'z-index\': stack.backdrop.z}" ng-show="stack.dialogs.length"></div>',
+			scope: {},
+			link: function(scope, element, attrs){
+				if (ezdialogStack.stack.backdrop) {
+					element.remove();
+					return;
+				}
+
+				scope.stack = ezdialogStack.stack;
+				ezdialogStack.stack.backdrop = scope;
+			}
+		};
+	})
+	.directive("ezdialogModal", function(ezdialogStack){
+		return {
+			restrict: "E",
+			template:
+				<div class="modal" ng-class="windowClass"></div>
+		}
+	})
+	.factory("ezdialogStack", function($compile){
+		var stack = {
+			dialogs: [],
+			backdrop: null
+		};
+		
+		return {
+			open: function(){
+				if (stack.backdrop === null) {
+					backdrop = angular.element("<ezdialog-backdrop></ezdialog-backdrop>");
+					document.body.append(backdrop);
+					$compile(backdrop);
+				} else {
+					stack.backdrop.lift();
+				}
+				
+				var dialog = angular.element("<ezdialog-modal></ezdialog-modal>");
+				document.body.append(dialog);
+				stack.push($compile(dialog));
+				
+				return instance;
+			},
+			close: function(){
+				
+			},
+			stack: stack
+		};
+	})
 	.factory("ezdialog", ["$modal", function($modal){
 		var conf = {
 			btn: {
