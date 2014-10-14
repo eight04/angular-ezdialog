@@ -1,59 +1,74 @@
 /* global angular */
 /* eslint eqeqeq: 0, quotes: 0, no-multi-str: 0 */
 
-angular.module("ezdialog", ["ui.bootstrap"])
-	.directive("ezdialogBackdrop", function(ezdialogStack){
+angular.module("ezdialog", [])
+	.directive("ezdialogStack", function($modal, $sce, $document){
 		return {
-			restrict: "E",
-			template: '<div class="modal-backdrop" ng-style="{\'z-index\': stack.backdrop.z}" ng-show="stack.dialogs.length"></div>',
+			restrict: "C",
+			template: "\
+				<div class=\"modal-backdrop in\" ng-style=\"{'z-index': dialogs[dialogs.length - 1].zIndex - 1}\" ng-show=\"dialogs.length\"></div>\
+				<div class=\"modal modal-{{dialog.type}}\" ng-repeat=\"dialog in dialogs\" ng-style=\"{'z-index': dialog.zIndex}\">\
+					<div class=\"modal-dialog modal-{{dialog.size}}\">\
+						<div class=\"modal-content\">\
+							<form role=\"form\" name=\"form\">\
+								<div class=\"modal-header\">\
+									<h3 class=\"modal-title\">{{dialog.title}}</h3>\
+								</div>\
+								<div class=\"modal-body\" ng-controller=\"ezdialog\">\
+									<span style=\"white-space: pre-wrap;\" ng-if=\"!dialog.templateLoaded\">{{dialog.msg}}</span>\
+									<ng-include src=\"dialog.template\" onload=\"dialog.templateLoaded=true\"></ng-include>\
+								</div>\
+								<div class=\"modal-footer\">\
+									<button class=\"btn btn-{{dialog.type}}\" ng-click=\"dialog.callback.ok()\" type=\"submit\" ng-if=\"dialog.yes!==undefined\" ng-disabled=\"form.$invalid\">{{dialog.yes}}</button>\
+									<button class=\"btn btn-default\" ng-click=\"dialog.callback.cancel()\" type=\"button\" ng-if=\"dialog.no!==undefined\">{{dialog.no}}</button>\
+								</div>\
+							</form>\
+						</div>\
+					</div>\
+				</div>",
 			scope: {},
 			link: function(scope, element, attrs){
-				if (ezdialogStack.stack.backdrop) {
-					element.remove();
-					return;
-				}
-
-				scope.stack = ezdialogStack.stack;
-				ezdialogStack.stack.backdrop = scope;
+				scope.dialogs = [];
+				scope.add = function(opt){
+					opt.zIndex = 40;
+					scope.dialogs.push(opt);
+					$document.find("body").addClass("modal-open");
+				};
+				scope.remove = function(dialog){
+					var i;
+					for (i = 0; i < scope.dialogs.length; i++) {
+						if (scope.dialogs[i] == dialog) {
+							scope.dialogs.splice(i, 1);
+							break;
+						}
+					}
+				};
+				
+				$modal.holder = scope;
 			}
 		};
 	})
-	.directive("ezdialogModal", function(ezdialogStack){
-		return {
-			restrict: "E",
-			template:
-				<div class="modal" ng-class="windowClass"></div>
-		}
-	})
-	.factory("ezdialogStack", function($compile){
-		var stack = {
-			dialogs: [],
-			backdrop: null
+	.factory("$modal", function($document, $rootScope, $compile, $timeout){
+		var element, ctrl;
+		
+		var init = {
+			open: function(opt){
+				if (!element) {
+					element = $compile("<div class=\"ezdialog-stack\"/>")($rootScope);
+					$document.find("body").append(element);
+					$timeout(function(){
+						init.open(opt);
+					});
+					return;
+				}
+				init.holder.add(opt);
+			},
+			holder: null
 		};
 		
-		return {
-			open: function(){
-				if (stack.backdrop === null) {
-					backdrop = angular.element("<ezdialog-backdrop></ezdialog-backdrop>");
-					document.body.append(backdrop);
-					$compile(backdrop);
-				} else {
-					stack.backdrop.lift();
-				}
-				
-				var dialog = angular.element("<ezdialog-modal></ezdialog-modal>");
-				document.body.append(dialog);
-				stack.push($compile(dialog));
-				
-				return instance;
-			},
-			close: function(){
-				
-			},
-			stack: stack
-		};
+		return init;
 	})
-	.factory("ezdialog", ["$modal", function($modal){
+	.factory("ezdialog", ["$modal", "$templateCache", function($modal, $templateCache){
 		var conf = {
 			btn: {
 				ok: "OK",
@@ -76,46 +91,19 @@ angular.module("ezdialog", ["ui.bootstrap"])
 			size: "sm",
 			backdrop: "static"
 		};
-		
-		var template = 
-			'<form role="form" name="dialog">\
-				<div class="modal-header">\
-					<h3 class="modal-title">{{ez.title}}</h3>\
-				</div>\
-				<div class="modal-body">\
-					<span style="white-space: pre-wrap;" ng-if="!ez.templateLoaded">{{ez.body}}</span>\
-					<ng-include src="ez.template" onload="ez.templateLoaded=true"></ng-include>\
-				</div>\
-				<div class="modal-footer">\
-					<button class="btn btn-{{ez.type}}" ng-click="ez.callback.ok()" type="submit" ng-if="ez.btn.yes!==undefined" ng-disabled="dialog.$invalid">{{ez.btn.yes}}</button>\
-					<button class="btn btn-default" ng-click="ez.callback.cancel()" type="button" ng-if="ez.btn.no!==undefined">{{ez.btn.no}}</button>\
-				</div>\
-			</form>';
 	
 		function dialog(opt){
 			var onclose = null, callback = {}, instance;
 			
-			instance = $modal.open({
-				template: template,
-				controller: "dialog",
-				resolve: {
-					opt: function(){
-						return opt;
-					},
-					callback: function(){
-						return callback;
-					}
-				},
-				size: opt.size || conf.size,
-				backdrop: opt.backdrop !== undefined ? opt.backdrop : conf.backdrop,
-				windowClass: opt.type ? "modal-" + opt.type : null
-			});
+			opt.size = opt.size || conf.size;
+			opt.callback = callback;
+			instance = $modal.open(opt);
 			
-			instance.result.then(function(value){
-				if (onclose) {
-					onclose(value);
-				}
-			});
+			// instance.result.then(function(value){
+				// if (onclose) {
+					// onclose(value);
+				// }
+			// });
 			
 			function close(func){
 				onclose = func;
@@ -224,33 +212,11 @@ angular.module("ezdialog", ["ui.bootstrap"])
 			conf: setConf
 		};
 	}])
-	.controller("dialog", ["$scope", "$modalInstance", "opt", "callback", 
-		function($scope, $modalInstance, opt, callback){
-			$scope.ez = {
-				btn: {
-					yes: opt.yes,
-					no: opt.no
-				},
-				body: opt.msg,
-				type: opt.type || "default",
-				title: opt.title,
-				template: opt.template,
-				callback: {
-					ok: function(){
-						$modalInstance.close(true);
-					},
-					cancel: function(){
-						$modalInstance.close(false);
-					}
-				}
-			};
-			
-			$scope.param = opt.param;
-			
-			for (var i in callback) {
-				if (typeof callback[i] == "function") {
-					$scope.ez.callback[i] = callback[i].bind($modalInstance, $scope);
-				}
-			}
-		}
-	]);
+	.controller("ezdialog", function($scope, $modal){
+		var dialog = $scope.dialog;
+		
+		dialog.callback.ok = function(){
+			$modal.holder.remove(dialog);
+		};
+		// dialog.param = 
+	});

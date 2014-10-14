@@ -137,3 +137,10 @@ var opt = {
 Todos
 -----
 * Enhance enter key press behavior.
+* Remove ui.bootstrap dependency and use ngAnimate.
+
+How It Works
+------------
+1. Dialog service call modal stack service.
+	* If no modal stack exist, create one.
+2. Dialog service ask to create a dialog.

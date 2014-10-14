@@ -3,8 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Document</title>
-	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.23/angular.min.js"></script>
-	<script src="http://angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.11.2.min.js"></script>
+	<script src="https://code.angularjs.org/1.2.26/angular.js"></script>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
 	
 	<script src="https://code.angularjs.org/1.2.25/angular-animate.js"></script>
@@ -13,15 +12,43 @@
 	<link rel="stylesheet" href="../dialog.css">
 	<style>
 	.modal {
-display: block;
-}
+		display: block;
+	}
+	.modal-backdrop.ng-hide-remove {
+		transition: 0.3s all ease;
+		opacity: 0;
+	}
+	.modal-backdrop.ng-hide-remove.ng-hide-remove-active {
+		opacity: 0.5;
+	}
+	.modal-backdrop.ng-hide-add {
+		transition: 0.2s all ease;
+		opacity: 0.5;
+	}
+	.modal-backdrop.ng-hide-add-active {
+		opacity: 0;
+	}
+	.modal.ng-enter {
+		transition: 0.4s all ease;
+		margin-top: -25px;
+		opacity: 0;
+	}
+	.modal.ng-enter.ng-enter-active {
+		margin-top: 0;
+		opacity: 1;
+	}
+	.modal.ng-leave {
+		transition: 0.2s all ease;
+		opacity: 1;
+	}
+	.modal.ng-leave.ng-leave-active {
+		margin-top: -25px;
+		opacity: 0;
+	}
 	</style>
 	
 	<script>
-		angular.module("App", ["ui.bootstrap", "ezdialog"]).controller("main", function($scope, ezdialog, $timeout, $animate){
-			$animate.enabled("off");
-			console.log($animate);
-		
+		angular.module("App", ["ezdialog", "ngAnimate"]).controller("main", function($scope, ezdialog, $timeout){
 			$scope.dialog = ezdialog;
 			
 			$scope.showRet = function(ret){
