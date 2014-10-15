@@ -29,38 +29,39 @@
 		});
 	</script>
 </head>
-<body ng-controller="main" class="container">
-	<h3>Default</h3>
-	<button class="btn btn-default" ng-click="dialog.show()">Show</button>
-	<button class="btn btn-default" ng-click="dialog.confirm()">Confirm</button>
-	<button class="btn btn-default" ng-click="dialog.yesno()">Yes/No</button>
-	<button class="btn btn-default" ng-click="dialog.error()">Error</button>
-	
-	<h3>Message and title</h3>
-	<button class="btn btn-default" ng-click="dialog.show('Hello!')">Hello</button>
-	<button class="btn btn-default" ng-click="dialog.show('Hello!', 'Jimmy')">Hello Jimmy!</button>
-	
-	<h3>Callback</h3>
-	<button class="btn btn-default" ng-click="dialog.confirm().close(showRet)">Confirm</button>
-	
-	<h3>Button click callback</h3>
-	<button class="btn btn-default" ng-click="dialog.confirm().ok(dialog.error)">OK with error</button>
-	
-	<h3>Change default setting</h3>
-	<button class="btn btn-default" ng-click="dialog.conf({size: 'lg'}).show('Everything should be large!')">Click to make everythin big</button>
-	
-	<h3>Further configure</h3>
-	<button class="btn btn-default" ng-click="dialog.show({title: 'This is title', msg: 'This should be green!', type: 'success', size: 'md'})">Custom</button>
-	
-	<h3>Use modal instance</h3>
-	<button class="btn btn-default" ng-click="timeout()">Timeout</button>
-	
-	<h3>Use custom template</h3>
-	<button class="btn btn-default" ng-click="dialog.show({template: 'template.html', param: {number: 999}})">Custom dialog</button>
-	<button class="btn btn-default" ng-click="dialog.show({template: 'template3.html', scope: {number: 999}})">Custom dialog 2</button>
-	<button class="btn btn-default" ng-click="dialog.show({template: 'template2.html'})">With http request</button>
-	<button class="btn btn-default" ng-click="dialog.show({msg: 'loading...', error: 'loading failed!', template: 'not-exist.html'})">Load error</button>
-	
+<body ng-controller="main">
+	<div class="container">
+		<h3>Default</h3>
+		<button class="btn btn-default" ng-click="dialog.show()">Show</button>
+		<button class="btn btn-default" ng-click="dialog.confirm()">Confirm</button>
+		<button class="btn btn-default" ng-click="dialog.yesno()">Yes/No</button>
+		<button class="btn btn-default" ng-click="dialog.error()">Error</button>
+		
+		<h3>Message and title</h3>
+		<button class="btn btn-default" ng-click="dialog.show('Hello!')">Hello</button>
+		<button class="btn btn-default" ng-click="dialog.show('Hello!', 'Jimmy')">Hello Jimmy!</button>
+		
+		<h3>Callback</h3>
+		<button class="btn btn-default" ng-click="dialog.confirm().close(showRet)">Confirm</button>
+		
+		<h3>Button click callback</h3>
+		<button class="btn btn-default" ng-click="dialog.confirm().ok(dialog.error)">OK with error</button>
+		
+		<h3>Change default setting</h3>
+		<button class="btn btn-default" ng-click="dialog.conf({size: 'lg'}).show('Everything should be large!')">Click to make everythin big</button>
+		
+		<h3>Further configure</h3>
+		<button class="btn btn-default" ng-click="dialog.show({title: 'This is title', msg: 'This should be green!', type: 'success', size: 'md'})">Custom</button>
+		
+		<h3>Use modal instance</h3>
+		<button class="btn btn-default" ng-click="timeout()">Timeout</button>
+		
+		<h3>Use custom template</h3>
+		<button class="btn btn-default" ng-click="dialog.show({template: 'template.html', param: {number: 999}})">Custom dialog</button>
+		<button class="btn btn-default" ng-click="dialog.show({template: 'template3.html', scope: {number: 999}})">Custom dialog 2</button>
+		<button class="btn btn-default" ng-click="dialog.show({template: 'template2.html'})">With http request</button>
+		<button class="btn btn-default" ng-click="dialog.show({msg: 'loading...', error: 'loading failed!', template: 'not-exist.html'})">Load error</button>
+	</div>
 	<script type="text/ng-template" id="template.html">
 		<p>Custom template! This will be include in modal body.</p>
 		<pre>$scope.param = {{param|json}}</pre>

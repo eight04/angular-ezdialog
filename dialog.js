@@ -60,18 +60,12 @@ angular.module("ezdialog", ["ngAnimate"])
 				dialog.instance = instance;
 				
 				if (!modalCtrl) {
-					// var modal = $compile($templateCache.get("ezdialog/modalTemplate.html"))($rootScope);
 					var modal = $compile("<ezdialog-modal/>")($rootScope);
 					$document.find("body").append(modal);
-					
-					$timeout(function(){
-						modalCtrl = modal.controller("ezdialogModal");
-						console.log(modalCtrl, dialog);
-						modalCtrl.add(dialog);
-					});
-				} else {
-					modalCtrl.add(dialog);
+					modalCtrl = modal.controller("ezdialogModal");
 				}
+				
+				modalCtrl.add(dialog);
 				
 				return instance;
 			}
