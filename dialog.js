@@ -4,7 +4,7 @@
 angular.module("ezdialog", ["ngAnimate"])
 	.run(function($templateCache){
 		$templateCache.put("ezdialog/modalTemplate.html", "\
-			<div class=\"modal-backdrop in\" ng-style=\"{'z-index': 1400 + dialogs.length * 10 - 11}\" ng-if=\"dialogs.length\"></div>\
+			<div class=\"modal-backdrop in\" ng-style=\"{'z-index': 1400 + dialogs.length * 10 - 11}\" ng-if=\"dialogs.length\" ng-destroy=\"backdropCleanup()\"></div>\
 			<div class=\"modal modal-{{dialog.type}}\" ng-repeat=\"dialog in dialogs\" ng-style=\"{'z-index': 1400 + $index * 10}\"><!--\
 			 --><div class=\"modal-dialog modal-{{dialog.size}}\">\
 					<div class=\"modal-content\">\
@@ -43,6 +43,7 @@ angular.module("ezdialog", ["ngAnimate"])
 				$rootScope.$apply(function(){
 					modalCtrl.ok(modal);
 				});
+				e.preventDefault();
 			}
 		});
 		
@@ -60,13 +61,12 @@ angular.module("ezdialog", ["ngAnimate"])
 				dialog.instance = instance;
 				
 				if (!modalCtrl) {
-					// var modal = $compile($templateCache.get("ezdialog/modalTemplate.html"))($rootScope);
 					var modal = $compile("<ezdialog-modal/>")($rootScope);
 					$document.find("body").append(modal);
 					
+					// You can't access modalCtrl before DOM update.
 					$timeout(function(){
 						modalCtrl = modal.controller("ezdialogModal");
-						console.log(modalCtrl, dialog);
 						modalCtrl.add(dialog);
 					});
 				} else {
@@ -77,13 +77,19 @@ angular.module("ezdialog", ["ngAnimate"])
 			}
 		}
 	})
-	.directive("ezdialogModal", function(){
+	.directive("ezdialogModal", function($animate){
 		return {
 			restrict: "E",
 			templateUrl: "ezdialog/modalTemplate.html",
 			scope: {},
-			controller: function($scope, $document){
+			controller: function($scope, $element, $document){
 				$scope.dialogs = [];
+
+				$scope.backdropCleanup = function(){
+					$document.find("body")
+						.removeClass("modal-open")
+						.css("padding-right", "");
+				};
 				
 				this.ok = $scope.ok = function(dialog){
 					if (dialog.callback.ok) {
@@ -102,9 +108,13 @@ angular.module("ezdialog", ["ngAnimate"])
 				};
 				
 				this.add = function(dialog){
-					$document.find("body").addClass("modal-open");
+					var body = $document.find("body");
+					if (!$scope.dialogs.length && !body[0].classList.contains("modal-open")) {
+						var scrWidth = window.innerWidth - document.body.clientWidth;
+						body.addClass("modal-open").css("padding-right", scrWidth + "px");
+					}
+					
 					$scope.dialogs.push(dialog);
-					// console.log($scope.dialogs);
 				};
 				
 				this.remove = function(dialog){
@@ -113,10 +123,6 @@ angular.module("ezdialog", ["ngAnimate"])
 						return;
 					}
 					$scope.dialogs.splice(k, 1);
-					
-					if (!$scope.dialogs.length) {
-						$document.find("body").removeClass("modal-open");
-					}
 				};
 				
 				this.top = function(){
@@ -150,19 +156,17 @@ angular.module("ezdialog", ["ngAnimate"])
 				}
 				
 				$timeout(function(){
-					console.log("focus");
-					var eles = element.find("input"), i;
+					var eles = element.parent("form").find("input"), i;
 					for (i = 0; i < eles.length; i++) {
 						if (eles[i].autofocus) {
 							eles[i].focus();
 							return;
 						}
 					}
-					if (eles.length) {
-						// eles[0].focus();
-					} else {
-						document.activeElement.blur();
-					}
+					var dialog = element.parent(".modal-dialog")[0];
+					dialog.tabIndex = 0;
+					dialog.style.outline = "none";
+					dialog.focus();
 				});
 			}
 		};
@@ -311,4 +315,17 @@ angular.module("ezdialog", ["ngAnimate"])
 			create: create,
 			conf: setConf
 		};
-	}]);
+	}])
+	.directive("ngDestroy", function(){
+		return {
+			restrict: "A",
+			scope: {
+				ngDestroy: "&"
+			},
+			link: function(scope, element, attrs){
+				element.on("$destroy", function(e){
+					scope.ngDestroy();
+				});
+			}
+		};
+	});
