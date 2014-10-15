@@ -42,22 +42,30 @@
 }
 
 .modal.ng-enter {
-	transition: 0.4s all ease;
-	transform: translateY(-25%);
-	opacity: 0;
+	transition: 0.4s;
 	
-	&.ng-enter-active {
+	.modal-dialog {
+		opacity: 0;
+		transform: translateY(-25%);
+	}
+	
+	&.ng-enter-active .modal-dialog {
+		transition: 0.4s all ease;
 		transform: none;
 		opacity: 1;
 	}
 }
 
 .modal.ng-leave {
-	transition: 0.2s all ease;
-	opacity: 1;
+	transition: 0.2s;
 	
-	&.ng-leave-active {
-		margin-top: -25px;
+	.modal-dialog {
+		opacity: 1;
+	}
+	
+	&.ng-leave-active .modal-dialog {
+		transition: 0.2s all ease;
+		transform: translateY(-25%);
 		opacity: 0;
 	}
 }

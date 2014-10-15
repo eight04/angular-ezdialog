@@ -32,20 +32,26 @@
   opacity: 0;
 }
 .modal.ng-enter {
-  transition: 0.4s all ease;
-  transform: translateY(-25%);
-  opacity: 0;
+  transition: 0.4s;
 }
-.modal.ng-enter.ng-enter-active {
+.modal.ng-enter .modal-dialog {
+  opacity: 0;
+  transform: translateY(-25%);
+}
+.modal.ng-enter.ng-enter-active .modal-dialog {
+  transition: 0.4s all ease;
   transform: none;
   opacity: 1;
 }
 .modal.ng-leave {
-  transition: 0.2s all ease;
+  transition: 0.2s;
+}
+.modal.ng-leave .modal-dialog {
   opacity: 1;
 }
-.modal.ng-leave.ng-leave-active {
-  margin-top: -25px;
+.modal.ng-leave.ng-leave-active .modal-dialog {
+  transition: 0.2s all ease;
+  transform: translateY(-25%);
   opacity: 0;
 }
 .modal-primary .modal-header {
