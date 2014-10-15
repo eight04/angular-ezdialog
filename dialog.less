@@ -1,0 +1,91 @@
+@import "bower_components/bootstrap/less/variables.less";
+
+// Use angular to hide/show modal
+.modal {
+	display: block;
+	
+	// Vertical center
+	@media (min-width: @screen-sm-min) {
+		text-align: center;
+		&:before {
+			content: "";
+			display: inline-block;
+			height: 100%;
+			vertical-align: middle;
+		}
+		
+		.modal-dialog {
+			display: inline-block;
+			vertical-align: middle;
+			text-align: left;
+		}
+	}
+}
+
+// Animate
+.modal-backdrop.ng-enter {
+	transition: 0.3s all ease;
+	opacity: 0;
+	
+	&.ng-enter-active {
+		opacity: 0.5;
+	}
+}
+
+.modal-backdrop.ng-leave {
+	transition: 0.2s all ease;
+	opacity: 0.5;
+	
+	&.ng-leave-active {
+		opacity: 0;
+	}
+}
+
+.modal.ng-enter {
+	transition: 0.4s all ease;
+	transform: translateY(-25%);
+	opacity: 0;
+	
+	&.ng-enter-active {
+		transform: none;
+		opacity: 1;
+	}
+}
+
+.modal.ng-leave {
+	transition: 0.2s all ease;
+	opacity: 1;
+	
+	&.ng-leave-active {
+		margin-top: -25px;
+		opacity: 0;
+	}
+}
+
+// Header color
+.modal-header{
+	.modal-primary & {
+		background-color: @brand-primary;
+		color: white;
+	}
+	
+	.modal-success & {
+		background-color: @brand-success;
+		color: white;
+	}
+	
+	.modal-info & {
+		background-color: @brand-info;
+		color: white;
+	}
+	
+	.modal-warning & {
+		background-color: @brand-warning;
+		color: white;
+	}
+	
+	.modal-danger & {
+		background-color: @brand-danger;
+		color: white;
+	}
+}

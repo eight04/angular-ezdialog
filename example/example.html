@@ -10,49 +10,13 @@
 
 	<script src="../dialog.js"></script>
 	<link rel="stylesheet" href="../dialog.css">
-	<style>
-	.modal {
-		display: block;
-	}
-	.modal-backdrop.ng-hide-remove {
-		transition: 0.3s all ease;
-		opacity: 0;
-	}
-	.modal-backdrop.ng-hide-remove.ng-hide-remove-active {
-		opacity: 0.5;
-	}
-	.modal-backdrop.ng-hide-add {
-		transition: 0.2s all ease;
-		opacity: 0.5;
-	}
-	.modal-backdrop.ng-hide-add-active {
-		opacity: 0;
-	}
-	.modal.ng-enter {
-		transition: 0.4s all ease;
-		margin-top: -25px;
-		opacity: 0;
-	}
-	.modal.ng-enter.ng-enter-active {
-		margin-top: 0;
-		opacity: 1;
-	}
-	.modal.ng-leave {
-		transition: 0.2s all ease;
-		opacity: 1;
-	}
-	.modal.ng-leave.ng-leave-active {
-		margin-top: -25px;
-		opacity: 0;
-	}
-	</style>
 	
 	<script>
 		angular.module("App", ["ezdialog", "ngAnimate"]).controller("main", function($scope, ezdialog, $timeout){
 			$scope.dialog = ezdialog;
 			
 			$scope.showRet = function(ret){
-				ezdialog.show(ret.toString());
+				ezdialog.show(String(ret));
 			};
 			
 			$scope.timeout = function(){	
@@ -93,13 +57,21 @@
 	
 	<h3>Use custom template</h3>
 	<button class="btn btn-default" ng-click="dialog.show({template: 'template.html', param: {number: 999}})">Custom dialog</button>
+	<button class="btn btn-default" ng-click="dialog.show({template: 'template3.html', scope: {number: 999}})">Custom dialog 2</button>
 	<button class="btn btn-default" ng-click="dialog.show({template: 'template2.html'})">With http request</button>
-	<button class="btn btn-default" ng-click="dialog.show({msg: 'loading failed!', template: 'not-exist.html'})">Load error</button>
+	<button class="btn btn-default" ng-click="dialog.show({msg: 'loading...', error: 'loading failed!', template: 'not-exist.html'})">Load error</button>
 	
 	<script type="text/ng-template" id="template.html">
 		<p>Custom template! This will be include in modal body.</p>
-		<pre>$scope.ez = {{ez}}</pre>
-		<input type="text" class="form-control" autofocus ng-model="param.number" required>
+		<pre>$scope.param = {{param|json}}</pre>
+		<p>Give autofocus attribute to focus an input.</p>
+		<input type="text" class="form-control" ng-model="param.number" autofocus required>
+	</script>
+	<script type="text/ng-template" id="template3.html">
+		<p>Custom template! This will be include in modal body.</p>
+		<pre>$scope.number = {{number}}<br>$parent.dialog = {{dialog|json}}</pre>
+		<p>Now ezdialog will copy scope attrs into new isolate scope! Sadly it won't reflect back to assigner.</p>
+		<input type="text" class="form-control" autofocus ng-model="number" required>
 	</script>
 </body>
 </html>

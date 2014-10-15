@@ -6,7 +6,10 @@
     "eight <eight04@gmail.com>"
   ],
   "description": "An simple AngularJS dialog service based on $modal of UI Bootstrap.",
-  "main": ["dialog.js", "dialog.css"],
+  "main": [
+    "dialog.js",
+    "dialog.css"
+  ],
   "moduleType": [
     "globals"
   ],
@@ -21,6 +24,9 @@
     "bower_components",
     "test",
     "tests",
-	"example"
-  ]
+    "example"
+  ],
+  "devDependencies": {
+    "bootstrap": "~3.2.0"
+  }
 }
