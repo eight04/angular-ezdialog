@@ -1,11 +1,12 @@
 angular-ezdialog
 ================
-
-A simple AngularJS dialog service based on $modal of UI Bootstrap
+A simple AngularJS dialog service build with Bootstrap modal. Also support ngAnimate!
 
 Demo
 ----
-You can check the demo [here](https://rawgit.com/eight04/angular-ezdialog/master/example/example.html).
+You can check the demo [here][1].
+
+[1]: https://rawgit.com/eight04/angular-ezdialog/master/example/example.html
 
 Usage
 -----
@@ -136,11 +137,6 @@ var opt = {
 
 Todos
 -----
-* Enhance enter key press behavior.
-* Remove ui.bootstrap dependency and use ngAnimate.
-
-How It Works
-------------
-1. Dialog service call modal stack service.
-	* If no modal stack exist, create one.
-2. Dialog service ask to create a dialog.
+* <del>Enhance enter key press behavior.</del> Done!
+* <del>Remove ui.bootstrap dependency and use ngAnimate.</del> Done!
+* Add ezmodal service and directive.

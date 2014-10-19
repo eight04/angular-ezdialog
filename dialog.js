@@ -24,7 +24,13 @@ angular.module("ezdialog", ["ngAnimate"])
 		);
 	})
 	.factory("ezmodal", function($templateCache, $compile, $rootScope, $document, $timeout, $q){
-		var modalCtrl;
+		var modalCtrl, modalStack = $compile("<ezdialog-modal/>")($rootScope);
+		$document.find("body").append(modalStack);
+		
+		// You can't access modalCtrl before DOM update.
+		$timeout(function(){
+			modalCtrl = modalStack.controller("ezdialogModal");
+		});
 		
 		$document.bind("keydown", function(e){
 			var modal;
@@ -60,18 +66,7 @@ angular.module("ezdialog", ["ngAnimate"])
 				
 				dialog.instance = instance;
 				
-				if (!modalCtrl) {
-					var modal = $compile("<ezdialog-modal/>")($rootScope);
-					$document.find("body").append(modal);
-					
-					// You can't access modalCtrl before DOM update.
-					$timeout(function(){
-						modalCtrl = modal.controller("ezdialogModal");
-						modalCtrl.add(dialog);
-					});
-				} else {
-					modalCtrl.add(dialog);
-				}
+				modalCtrl.add(dialog);
 				
 				return instance;
 			}
@@ -327,5 +322,12 @@ angular.module("ezdialog", ["ngAnimate"])
 					scope.ngDestroy();
 				});
 			}
+		};
+	})
+	.directive("ezmodal", function(){
+		return {
+			restrict: "E",
+			transclude: true,
+			templateUrl: "ezdialog/modalContent"
 		};
 	});

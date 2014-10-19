@@ -61,6 +61,24 @@
 		<button class="btn btn-default" ng-click="dialog.show({template: 'template3.html', scope: {number: 999}})">Custom dialog 2</button>
 		<button class="btn btn-default" ng-click="dialog.show({template: 'template2.html'})">With http request</button>
 		<button class="btn btn-default" ng-click="dialog.show({msg: 'loading...', error: 'loading failed!', template: 'not-exist.html'})">Load error</button>
+		
+		<h3>Use ezmodal tag</h3>
+		<button class="btn btn-default" ezmodal-toggle="modal1">Click me to open dialog</button>
+		
+		<ezmodal id="modal1" size="lg" ng-controller="my-modal" backdrop="static" class="my-modal">
+			<div class="modal-header">
+				<button type="button" class="close" ezmodal-toggle="modal1">
+					<span aria-hidden="true">&times;</span>
+					<span class="sr-only">Close</span>
+				</button>
+				<h4 class="modal-title">Ezmodal Test!</h4>
+			</div>
+			<div class="modal-body">
+				<p>Use modal directive with its own controller!</p>
+				<input type="text" class="form-control" ng-model="number">
+				<pre>$scope.number = {{number}}</pre>
+			</div>
+		</ezmodal>
 	</div>
 	<script type="text/ng-template" id="template.html">
 		<p>Custom template! This will be include in modal body.</p>
