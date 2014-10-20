@@ -17,28 +17,8 @@ function getParentByClass(element, cls){
 }
 
 angular.module("ezdialog", ["ngAnimate"])
-	.run(function($templateCache){
-		$templateCache.put("ezdialog/modalTemplate.html", "\
-			<div class=\"modal-backdrop in\" ng-style=\"{'z-index': getBackdropZ()}\" ng-if=\"dialogs.length\" ng-destroy=\"backdropCleanup()\"></div>\
-			<div class=\"modal modal-{{dialog.type}}\" ng-repeat=\"dialog in dialogs | filter:isDialog\" ng-style=\"{'z-index': dialog.zIndex}\"><!--\
-				--><div class=\"modal-dialog modal-{{dialog.size}}\" tabindex=\"-1\" role=\"dialog\">\
-					<div class=\"modal-content\">\
-						<form role=\"form\" name=\"form\">\
-							<div class=\"modal-header\">\
-								<h3 class=\"modal-title\">{{dialog.title}}</h3>\
-							</div>\
-							<div class=\"modal-body ezdialog-body\"></div>\
-							<div class=\"modal-footer\">\
-								<button class=\"btn btn-{{dialog.type}}\" ng-click=\"ok(dialog)\" type=\"submit\" ng-if=\"dialog.yes!==undefined\" ng-disabled=\"form.$invalid\">{{dialog.yes}}</button>\
-								<button class=\"btn btn-default\" ng-click=\"cancel(dialog)\" type=\"button\" ng-if=\"dialog.no!==undefined\">{{dialog.no}}</button>\
-							</div>\
-						</form>\
-					</div>\
-				</div>\
-			</div>"
-		);
-	})
-	.factory("ezmodal", function($templateCache, $compile, $rootScope, $document, $timeout, $q){
+	.factory("ezmodal", ["$compile", "$rootScope", "$document", "$timeout", "$q",
+			function($compile, $rootScope, $document, $timeout, $q){
 		var modalCtrl, modalStack = $compile("<ezdialog-modal/>")($rootScope), modals = {};
 		$document.find("body").append(modalStack);
 		
@@ -132,13 +112,30 @@ angular.module("ezdialog", ["ngAnimate"])
 				}
 			}
 		};
-	})
-	.directive("ezdialogModal", function($animate, $timeout){
+	}])
+	.directive("ezdialogModal", ["$animate", "$timeout", function($animate, $timeout){
 		return {
 			restrict: "E",
-			templateUrl: "ezdialog/modalTemplate.html",
+			template: 
+				"<div class=\"modal-backdrop in\" ng-style=\"{'z-index': getBackdropZ()}\" ng-if=\"dialogs.length\" ng-destroy=\"backdropCleanup()\"></div>\
+				<div class=\"modal modal-{{dialog.type}}\" ng-repeat=\"dialog in dialogs | filter:isDialog\" ng-style=\"{'z-index': dialog.zIndex}\"><!--\
+					--><div class=\"modal-dialog modal-{{dialog.size}}\" tabindex=\"-1\" role=\"dialog\">\
+						<div class=\"modal-content\">\
+							<form role=\"form\" name=\"form\">\
+								<div class=\"modal-header\">\
+									<h3 class=\"modal-title\">{{dialog.title}}</h3>\
+								</div>\
+								<div class=\"modal-body ezdialog-body\"></div>\
+								<div class=\"modal-footer\">\
+									<button class=\"btn btn-{{dialog.type}}\" ng-click=\"ok(dialog)\" type=\"submit\" ng-if=\"dialog.yes!==undefined\" ng-disabled=\"form.$invalid\">{{dialog.yes}}</button>\
+									<button class=\"btn btn-default\" ng-click=\"cancel(dialog)\" type=\"button\" ng-if=\"dialog.no!==undefined\">{{dialog.no}}</button>\
+								</div>\
+							</form>\
+						</div>\
+					</div>\
+				</div>",
 			scope: {},
-			controller: function($scope, $element, $document){
+			controller: ["$scope", "$document", function($scope, $document){
 				$scope.dialogs = [];
 				
 				$scope.getBackdropZ = function(){
@@ -235,9 +232,9 @@ angular.module("ezdialog", ["ngAnimate"])
 					}
 					return $scope.dialogs[last];
 				};
-			}
+			}]
 		};
-	})
+	}])
 	.directive("ezdialogBody", function(){
 		return {
 			restrict: "C",
@@ -264,7 +261,7 @@ angular.module("ezdialog", ["ngAnimate"])
 			}
 		};
 	})
-	.factory("ezdialog", ["ezmodal", "$templateCache", function($modal){
+	.factory("ezdialog", ["ezmodal", function($modal){
 		var conf = {
 			btn: {
 				ok: "OK",
@@ -422,7 +419,7 @@ angular.module("ezdialog", ["ngAnimate"])
 			}
 		};
 	})
-	.directive("ezmodal", function(ezmodal){
+	.directive("ezmodal", ["ezmodal", function(ezmodal){
 		return {
 			restrict: "E",
 			transclude: true,
@@ -458,8 +455,8 @@ angular.module("ezdialog", ["ngAnimate"])
 				ezmodal.register(fakeDialog);
 			}
 		};
-	})
-	.directive("ezmodalToggle", function(ezmodal){
+	}])
+	.directive("ezmodalToggle", ["ezmodal", function(ezmodal){
 		return {
 			restrict: "A",
 			link: function(scope, element, attrs){
@@ -471,6 +468,6 @@ angular.module("ezdialog", ["ngAnimate"])
 				});
 			}
 		};
-	});
+	}]);
 
 })();

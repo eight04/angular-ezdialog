@@ -23,7 +23,7 @@ ezdialog.error("error").close(function(ret){
     ezdialog.show("dialog closed! returned value: " + ret);
 });
 
-// Replace default button click callback
+// Replace default button click handler
 ezdialog.confirm()
     .ok(function(){
         ezdialog.show("OK");
@@ -42,7 +42,7 @@ ezdialog.yesno()
         ezdialog.show("ret: " + ret);
     });
 
-// Change default settings. It will affect all dialog globally.
+// Change default setting, which will affect all dialog globally.
 ezdialog.conf({
     size: "lg",
     title: {
@@ -59,7 +59,7 @@ ezdialog.show({
     no: "and this is no button text"
 });
 
-// Use a custom template. Template will be include in dialog body.
+// Use a custom template. Template will be included in dialog body.
 ezdialog.show({
 	title: "use template",
 	template: "my-dialog.html"
@@ -69,13 +69,13 @@ ezdialog.show({
 Methods
 -------
 ```JavaScript
-// there are 5 methods to display dialog
+// There are 5 methods to display dialog
 ezdialog.error()
 ezdialog.show()
 ezdialog.confirm()
 ezdialog.yesno()	// same as confirm, but button text setted as Yes/No instead of OK/Cancel.
 
-// these methods will return a dialog object. You can provide some callbacks.
+// These methods will return a dialog object. You can provide some callbacks.
 // Note that you have to call this.close() in ok/cancel callback to close dialog.
 dialog.confirm()
 	.ok(func)		// call when click on ok button
@@ -107,8 +107,7 @@ var conf = {
 		yesno: "Yes or no?",
 		error: "An error occurred!"
 	},
-	size: 'sm',
-	backdrop: 'static'
+	size: 'sm'
 };
 
 // full option list you can pass to dialog's method
@@ -126,9 +125,6 @@ var opt = {
 	// dialog size. sm|md|lg
 	size: "sm"
 
-	// dialog backdrop. true|false|static
-	backdrop: "static",
-
 	// dialog template. will be place in dialog body.
 	// message will be hide if template successfully loaded.
 	template: "template.html"
@@ -139,4 +135,4 @@ Todos
 -----
 * <del>Enhance enter key press behavior.</del> Done!
 * <del>Remove ui.bootstrap dependency and use ngAnimate.</del> Done!
-* Add ezmodal service and directive.
+* <del>Add ezmodal service and directive.</del> Done!
