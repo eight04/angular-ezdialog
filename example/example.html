@@ -26,6 +26,8 @@
 					dialog.instance.close();
 				}, 1000);
 			};
+			
+			$scope.number = 12345;
 		});
 	</script>
 </head>
@@ -65,7 +67,7 @@
 		<h3>Use ezmodal tag</h3>
 		<button class="btn btn-default" ezmodal-toggle="modal1">Click me to open dialog</button>
 		
-		<ezmodal id="modal1" size="lg" ng-controller="my-modal" backdrop="static" class="my-modal">
+		<ezmodal id="modal1" size="lg" backdrop-toggle>
 			<div class="modal-header">
 				<button type="button" class="close" ezmodal-toggle="modal1">
 					<span aria-hidden="true">&times;</span>
@@ -75,8 +77,8 @@
 			</div>
 			<div class="modal-body">
 				<p>Use modal directive with its own controller!</p>
-				<input type="text" class="form-control" ng-model="number">
-				<pre>$scope.number = {{number}}</pre>
+				<p><input type="text" class="form-control" ng-model="number" autofocus></p>
+				<p><pre>$scope.number = {{number}}</pre></p>
 			</div>
 		</ezmodal>
 	</div>

@@ -1,4 +1,4 @@
-.modal {
+ezdialog-modal .modal {
   display: block;
 }
 @media (min-width: 768px) {
@@ -53,6 +53,28 @@
   transition: 0.2s all ease;
   transform: translateY(-25%);
   opacity: 0;
+}
+.modal.show-add {
+  transition: 0.4s all ease;
+  display: block;
+}
+.modal.show-add .modal-dialog {
+  opacity: 0;
+  transform: translateY(-25%);
+}
+.modal.show-add.show-add-active .modal-dialog {
+  transition: 0.4s all ease;
+  opacity: 1;
+  transform: none;
+}
+.modal.show-remove {
+  transition: 0.4s all ease;
+  display: block;
+}
+.modal.show-remove.show-remove-active .modal-dialog {
+  transition: 0.2s all ease;
+  opacity: 0;
+  transform: translateY(-25%);
 }
 .modal-primary .modal-header {
   background-color: #428bca;
