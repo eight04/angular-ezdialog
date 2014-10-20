@@ -1,21 +1,26 @@
 {
   "name": "angular-ezdialog",
-  "version": "1.0.4",
+  "version": "2.0",
   "homepage": "https://github.com/eight04/angular-ezdialog",
   "authors": [
     "eight <eight04@gmail.com>"
   ],
-  "description": "An simple AngularJS dialog service based on $modal of UI Bootstrap.",
+  "description": "An simple AngularJS dialog service build with Bootstrap's modal.",
   "main": [
     "dialog.js",
-    "dialog.css"
+    "dialog.min.js",
+    "dialog.min.js.map",
+    "dialog.less"
+    "dialog.min.css"
+    "dialog.min.css.map"
   ],
   "moduleType": [
     "globals"
   ],
   "keywords": [
     "angular",
-    "dialog"
+    "dialog",
+	"bootstrap"
   ],
   "license": "MIT",
   "ignore": [
@@ -23,8 +28,7 @@
     "node_modules",
     "bower_components",
     "test",
-    "tests",
-    "example"
+    "tests"
   ],
   "devDependencies": {
     "bootstrap": "~3.2.0"
