@@ -14,7 +14,7 @@ Install with bower:
 ```sh
 bower install angular-ezdialog --save
 ```
-Put them in your html head:
+In html head:
 ```html
 <script src="bower_components/angular-ezdialog/dist/dialog.min.js">
 <link rel="stylesheet" href="bower_components/angular-ezdialog/dist/dialog.min.css">
