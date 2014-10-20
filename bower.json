@@ -1,18 +1,14 @@
 {
   "name": "angular-ezdialog",
-  "version": "2.0",
+  "version": "2.0.1",
   "homepage": "https://github.com/eight04/angular-ezdialog",
   "authors": [
     "eight <eight04@gmail.com>"
   ],
   "description": "An simple AngularJS dialog service build with Bootstrap's modal.",
   "main": [
-    "dialog.js",
-    "dialog.min.js",
-    "dialog.min.js.map",
-    "dialog.less"
-    "dialog.min.css"
-    "dialog.min.css.map"
+    "dist/dialog.js",
+    "dist/dialog.css"
   ],
   "moduleType": [
     "globals"

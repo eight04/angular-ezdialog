@@ -1,6 +1,6 @@
 angular-ezdialog
 ================
-A simple AngularJS dialog service build with Bootstrap modal. Also support ngAnimate!
+A simple AngularJS dialog service build with Bootstrap modal and ngAnimate. This service was aimed to replace native `window.alert`.
 
 Demo
 ----
@@ -8,8 +8,22 @@ You can check the demo [here][1].
 
 [1]: https://rawgit.com/eight04/angular-ezdialog/master/example/example.html
 
+Install
+-------
+Install with bower:
+```sh
+bower install angular-ezdialog --save
+```
+Put them in your html head:
+```html
+<script src="bower_components/angular-ezdialog/dist/dialog.min.js">
+<link rel="stylesheet" href="bower_components/angular-ezdialog/dist/dialog.min.css">
+```
+The css file was built with official bootstrap v3.2.0. Create your own build for custom dialog color.
+
 Usage
 -----
+Use ezdialog service:
 ```JavaScript
 // Pop a simple error
 ezdialog.error("error");
@@ -33,15 +47,6 @@ ezdialog.confirm()
         ezdialog.show("press Yes to close dialog");
     });
 
-// Make dialog always return true
-ezdialog.yesno()
-    .cancel(function(
-        this.close(true);
-    ))
-    .close(function(ret){
-        ezdialog.show("ret: " + ret);
-    });
-
 // Change default setting, which will affect all dialog globally.
 ezdialog.conf({
     size: "lg",
@@ -50,13 +55,13 @@ ezdialog.conf({
     }
 }).show();
 
-// Call method with options.
+// Call method with option object.
 ezdialog.show({
     title: "my title",
     msg: "my message",
     size: "md",
-    yes: "this is yes button text",
-    no: "and this is no button text"
+    yes: "yes button text",
+    no: "no button text"
 });
 
 // Use a custom template. Template will be included in dialog body.
@@ -65,9 +70,27 @@ ezdialog.show({
 	template: "my-dialog.html"
 });
 ```
+After version 2.0, ezdialog has its own modal service `ezmodal`:
+```javascript
+ezmodal.toggle("my-modal");
+```
+And directive:
+```html
+<button ezmodal-toggle="my-modal">Open modal</button>
 
-Methods
--------
+<ezmodal id="my-modal" size="sm" backdrop-toggle>
+	<div class="modal-header">
+    	...
+    </div>
+    <div class="modal-body">
+    	...
+    </div>
+</ezmodal>
+```
+Check the demo page for more examples.
+
+Service Methods
+---------------
 ```JavaScript
 // There are 5 methods to display dialog
 ezdialog.error()
@@ -75,12 +98,15 @@ ezdialog.show()
 ezdialog.confirm()
 ezdialog.yesno()	// same as confirm, but button text setted as Yes/No instead of OK/Cancel.
 
-// These methods will return a dialog object. You can provide some callbacks.
-// Note that you have to call this.close() in ok/cancel callback to close dialog.
-dialog.confirm()
+// These methods will return a dialog instance. You can provide some callbacks.
+// You have to call this.close() in ok/cancel callback to close dialog.
+dialogInstance.confirm()
 	.ok(func)		// call when click on ok button
 	.cancel(func)	// call when click on cancel button
 	.close(func)	// after dialog close.
+
+// Use ezmodal service to toggle modal.
+ezmodal.toggle(id)
 ```
 
 Options
@@ -110,7 +136,7 @@ var conf = {
 	size: 'sm'
 };
 
-// full option list you can pass to dialog's method
+// The option object you can pass to ezdialog's methods
 var opt = {
 	title: "title",
 	msg: "message",
@@ -125,10 +151,28 @@ var opt = {
 	// dialog size. sm|md|lg
 	size: "sm"
 
-	// dialog template. will be place in dialog body.
-	// message will be hide if template successfully loaded.
-	template: "template.html"
+	// Use custom template in dialog body
+	template: "template.html",
+    // Show if failed to load template
+    error: "error message",
+    // Variables to bind to isolate dialog scope
+    scope: {
+    	number: 999
+    }
 };
+```
+ezmodal direcive:
+```html
+<button ezmodal-toggle="my-modal">Toggle modal</button>
+<!--
+	ezmodal-toggle: String. Modal's id.
+-->
+
+<ezmodal id="my-modal" size="md" backdrop-toggle></ezmodal>
+<!--
+	size: Value could be sm|md|lg. Set modal's size.
+    backdrop-toggle: Optional. If given, modal will be closed when clicking on the backdrop.
+-->
 ```
 
 Todos
@@ -136,3 +180,4 @@ Todos
 * <del>Enhance enter key press behavior.</del> Done!
 * <del>Remove ui.bootstrap dependency and use ngAnimate.</del> Done!
 * <del>Add ezmodal service and directive.</del> Done!
+* Add onclose attribute to overide default ESC key behavior.
