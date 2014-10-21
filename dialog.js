@@ -399,7 +399,8 @@ angular.module("ezdialog", ["ngAnimate"])
 			yesno: yesno,
 			show: show,
 			create: create,
-			conf: setConf
+			conf: setConf,
+			configure: conf
 		};
 	}])
 	.directive("ngDestroy", function(){
@@ -464,6 +465,99 @@ angular.module("ezdialog", ["ngAnimate"])
 				});
 			}
 		};
-	}]);
+	}])
+	.directive("ezdialog", function(ezdialog, ezmodal){
+		return {
+			restrict: "E",
+			transclude: true,
+			template: 
+				'<div class="modal-dialog" ng-class="\'modal-\' + (size || default.size)" tabindex="-1" role="dialog">\
+					<div class="modal-content">\
+						<form role="form" name="form">\
+							<div class="modal-header">\
+								<h3 class="modal-title">{{title}}</h3>\
+							</div>\
+							<div class="modal-body" ng-transclude></div>\
+							<div class="modal-footer">\
+								<button class="btn" ng-class="\'btn-\' + theme" ng-click="instance.ok()" type="submit" ng-if="yes!==undefined" ng-disabled="form.$invalid">{{yes}}</button>\
+								<button class="btn btn-default" ng-click="instance.cancel()" type="button" ng-if="no!==undefined">{{no}}</button>\
+							</div>\
+						</form>\
+					</div>\
+				</div>',
+			scope: {
+				id: "@",
+				size: "@",
+				backdropToggle: "@",
+				title: "@",
+				type: "@",
+				onclose: "&",
+				oncancel: "&",
+				onok: "&",
+				yes: "@",
+				no: "@"
+			},
+			link: function(scope, element, attrs){
+				if (!scope.id) {
+					throw "ezdialog directive requires 'id' attribute";
+				}
+				if (!scope.type) {
+					throw "ezdialog directive requires 'type' attribute";
+				}
+				if (!scope.title) {
+					scope.title = ezdialog.configure.title[scope.type];
+				}
+				switch (scope.type) {
+					case "show":
+					case "error":
+						scope.yes = scope.yes || ezdialog.configure.btn.ok;
+						break;
+						
+					case "confirm":
+						scope.yes = scope.yes || ezdialog.configure.btn.ok;
+						scope.no = scope.no || ezdialog.configure.btn.cancel;
+						break;
+						
+					case "yesno":
+						scope.yes = scope.yes || ezdialog.configure.btn.yes;
+						scope.no = scope.no || ezdialog.configure.btn.no;
+						break;
+				}
+				scope.theme = "primary";
+				
+				if (scope.type == "error") {
+					scope.theme = "danger";
+				}
+				
+				scope.default = ezdialog.configure;
+				
+				scope.fake = {
+					fake: true,
+					id: scope.id,
+					element: element,
+					handleEnter: true,
+					callback: {
+						ok: scope.onok,
+						cancel: scope.oncancel,
+						close: scope.onclose
+					}
+				};
+				
+				element.addClass("modal modal-" + scope.theme);
+				
+				if (scope.backdropToggle !== undefined) {
+					element.on("click", function(e){
+						if (e.target == this) {
+							scope.$apply(function(){
+								scope.instance.close();
+							});
+						}
+					});
+				}
+				
+				ezmodal.register(scope.dialog);
+			}
+		};
+	});
 
 })();

@@ -8,7 +8,7 @@
 	
 	<script src="https://code.angularjs.org/1.2.25/angular-animate.js"></script>
 
-	<script src="../dist/dialog.min.js"></script>
+	<script src="../dialog.js"></script>
 	<link rel="stylesheet" href="../dist/dialog.min.css">
 	
 	<script>
@@ -66,6 +66,12 @@
 		<button class="btn btn-default" ng-click="dialog.show({template: 'template3.html', scope: {number: 999, input: {number: 888}}})">Custom dialog (After version 2.0)</button>
 		<button class="btn btn-default" ng-click="dialog.show({template: 'template2.html'})">With http request</button>
 		<button class="btn btn-default" ng-click="dialog.show({msg: 'loading...', error: 'loading failed!', template: 'not-exist.html'})">Loading error</button>
+		
+		<h3>Use ezdialog directive</h3>
+		<button class="btn btn-default" ezmodal-toggle="my-dialog">Toggle dialog</button>
+		<ezdialog id="my-dialog" title="Ezdialog directive" size="sm" type="confirm" onclose="dialog.show('closed')" onok="dialog.show('ok')" oncancel="dialog.show('cancel')" yes="YEEES" no="NOOOO" backdrop-toggle>
+			Hi!
+		</ezdialog>
 		
 		<h3>Use ezmodal directive</h3>
 		<button class="btn btn-default" ezmodal-toggle="modal1">Toggle modal</button>
