@@ -3,7 +3,8 @@
 		browser: true
 	},
 	rules: {
-		"no-trailing-spaces": 0
+		"no-trailing-spaces": 0,
+		"eqeqeq": 0
 	},
 	globals: {
 		angular: false

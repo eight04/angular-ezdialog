@@ -1,0 +1,14 @@
+<div class="modal-dialog" ng-class="'modal-' + (size || default.size)" tabindex="-1" role="dialog">
+	<div class="modal-content">
+		<form role="form" name="form">
+			<div class="modal-header">
+				<h3 class="modal-title">{{title || default.title[type]}}</h3>
+			</div>
+			<div class="modal-body" ng-transclude></div>
+			<div class="modal-footer">
+				<button class="btn" ng-class="'btn-' + theme" ng-click="ok()" type="submit" ng-if="yes!==undefined" ng-disabled="form.$invalid">{{yes}}</button>
+				<button class="btn btn-default" ng-click="cancel()" type="button" ng-if="no!==undefined">{{no}}</button>
+			</div>
+		</form>
+	</div>
+</div>

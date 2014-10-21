@@ -1,0 +1,21 @@
+<div class="modal-backdrop in" ng-style="{'z-index': getBackdropZ()}" ng-if="dialogs.length" ng-destroy="backdropCleanup()"></div>
+<div class="modal" ng-class="'modal-' + (dialog.type || 'default')" ng-repeat="dialog in dialogs | filter:{isDialog:true}" ng-style="{'z-index': dialog.zIndex}" ng-click="backdropToggle(dialog)"><!--
+	--><div class="modal-dialog" ng-class="'modal-' + (dialog.size || default.size)" tabindex="-1" role="dialog">
+		<div class="modal-content">
+			<form role="form" name="form">
+				<div class="modal-header">
+					<h3 class="modal-title">{{dialog.title || default.title[dialog.use]}}</h3>
+				</div>
+				<div class="modal-body">
+					<span style="white-space: pre-wrap;" ng-if="!dialog.template && !dialog.loaded">{{dialog.msg}}</span>
+					<span style="white-space: pre-wrap;" ng-if="dialog.template && !dialog.loaded">{{dialog.error || dialog.msg}}</span>
+					<div ezdialog-body ng-if="dialog.template"></div>
+				</div>
+				<div class="modal-footer">
+					<button class="btn" ng-class="'btn-' + (dialog.type || 'default')" ng-click="dialog.ok()" ng-if="dialog.yes !== undefined" ng-disabled="form.$invalid">{{dialog.yes}}</button>
+					<button class="btn btn-default" ng-click="dialog.cancel()" type="button" ng-if="dialog.no !== undefined">{{dialog.no}}</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>

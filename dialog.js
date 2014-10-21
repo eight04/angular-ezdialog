@@ -2,137 +2,20 @@
 
 "use strict";
 
-function getParentByClass(element, cls){
-	while (element[0].parentNode) {
-		element = element.parent();
-		if (element.hasClass(cls)) {
-			return element;
-		}
-	}
-	return null;
-}
-
 angular.module("ezdialog", ["ngAnimate"])
-	.factory("ezmodal", ["$compile", "$rootScope", "$document", "$timeout", "$q",
-			function($compile, $rootScope, $document, $timeout, $q){
-		var modalCtrl, modalStack = $compile("<ezdialog-modal/>")($rootScope), modals = {};
-		$document.find("body").append(modalStack);
-		
-		// You can't access modalCtrl before DOM update.
-		$timeout(function(){
-			modalCtrl = modalStack.controller("ezdialogModal");
-		});
-		
-		$document.on("keydown", function(e){
-			var modal, inputs, dirty, next, i;
-			if (!modalCtrl || !(modal = modalCtrl.top()) || e.ctrlKey || e.altKey) {
-				return;
-			}
-			
-			if (e.keyCode == 27 && !e.shiftKey) {
-				$rootScope.$apply(function(){
-					modal.instance.close();
-				});
-				e.preventDefault();
-			}
-			
-			if (e.keyCode == 13 && !modal.fake && !e.shiftKey) {
-				$rootScope.$apply(function(){
-					modalCtrl.ok(modal);
-				});
-				e.preventDefault();
-			}
-			
-			if (e.keyCode == 9) {
-				inputs = modal.element[0].querySelectorAll("input, select, button, textarea, a, [tabindex]");
-				for (i = 0; i < inputs.length; i++) {
-					if (inputs[i] == document.activeElement) {
-						if (!e.shiftKey) {
-							next = (i + 1) % inputs.length;
-						} else {
-							next = (i - 1 + inputs.length) % inputs.length;
-						}
-						inputs[next].focus();
-						dirty = true;
-						break;
-					}
-				}
-				if (!dirty && inputs.length) {
-					inputs[0].focus();
-				}
-				e.preventDefault();
-			}
-		});
-		
-		function init(dialog) {
-			var deferred = $q.defer();
-			var instance = {
-				close: function(ret){
-					modalCtrl.remove(dialog);
-					deferred.resolve(ret);
-				},
-				result: deferred.promise
-			};
-			
-			if (!dialog.callback) {
-				dialog.callback = {};
-			}
-			
-			dialog.instance = instance;
-		}
-		
+	.directive("ezdialogStack", ["$animate", "$timeout", function($animate, $timeout){
 		return {
-			open: function(dialog){
-				init(dialog);
-				
-				modalCtrl.add(dialog);
-				return dialog.instance;
-			},
-			register: function(dialog){
-				modals[dialog.id] = dialog;
-			},
-			toggle: function(arg){
-				var dialog;
-				if (angular.isString(arg)) {
-					dialog = modals[arg];
-				} else if (angular.isObject(arg)) {
-					dialog = arg;
-				}
-				
-				init(dialog);
-				
-				if (dialog.isOpened) {
-					modalCtrl.remove(dialog);
-				} else {
-					modalCtrl.add(dialog);
-				}
-			}
-		};
-	}])
-	.directive("ezdialogModal", ["$animate", "$timeout", function($animate, $timeout){
-		return {
-			restrict: "E",
-			template: 
-				"<div class=\"modal-backdrop in\" ng-style=\"{'z-index': getBackdropZ()}\" ng-if=\"dialogs.length\" ng-destroy=\"backdropCleanup()\"></div>\
-				<div class=\"modal modal-{{dialog.type}}\" ng-repeat=\"dialog in dialogs | filter:isDialog\" ng-style=\"{'z-index': dialog.zIndex}\"><!--\
-					--><div class=\"modal-dialog modal-{{dialog.size}}\" tabindex=\"-1\" role=\"dialog\">\
-						<div class=\"modal-content\">\
-							<form role=\"form\" name=\"form\">\
-								<div class=\"modal-header\">\
-									<h3 class=\"modal-title\">{{dialog.title}}</h3>\
-								</div>\
-								<div class=\"modal-body ezdialog-body\"></div>\
-								<div class=\"modal-footer\">\
-									<button class=\"btn btn-{{dialog.type}}\" ng-click=\"ok(dialog)\" type=\"submit\" ng-if=\"dialog.yes!==undefined\" ng-disabled=\"form.$invalid\">{{dialog.yes}}</button>\
-									<button class=\"btn btn-default\" ng-click=\"cancel(dialog)\" type=\"button\" ng-if=\"dialog.no!==undefined\">{{dialog.no}}</button>\
-								</div>\
-							</form>\
-						</div>\
-					</div>\
-				</div>",
+			restrict: "A",
+			templateUrl: "templates/ezdialogStack.html",
 			scope: {},
 			controller: ["$scope", "$document", function($scope, $document){
 				$scope.dialogs = [];
+				
+				$scope.backdropToggle = function(dialog){
+					if (dialog.toggleBackdrop) {
+						dialog.close();
+					}
+				};
 				
 				$scope.getBackdropZ = function(){
 					var last = $scope.dialogs.length - 1;
@@ -141,31 +24,11 @@ angular.module("ezdialog", ["ngAnimate"])
 					}
 					return 1399;
 				};
-				
-				$scope.isDialog = function(dialog){
-					return !dialog.fake;
-				};
 
 				$scope.backdropCleanup = function(){
 					$document.find("body")
 						.removeClass("modal-open")
 						.css("padding-right", "");
-				};
-				
-				this.ok = $scope.ok = function(dialog){
-					if (dialog.callback.ok) {
-						dialog.callback.ok.call(dialog.instance);
-					} else {
-						dialog.instance.close(true);
-					}
-				};
-				
-				this.cancel = $scope.cancel = function(dialog){
-					if (dialog.callback.cancel) {
-						dialog.callback.cancel.call(dialog.instance);
-					} else {
-						dialog.instance.close(false);
-					}
 				};
 				
 				this.add = function(dialog){
@@ -184,11 +47,10 @@ angular.module("ezdialog", ["ngAnimate"])
 					
 					dialog.isOpened = true;
 					
-					if (dialog.fake) {
+					if (!dialog.isDialog) {
 						dialog.element.css("z-index", dialog.zIndex);
 						$animate.addClass(dialog.element, "show");
 					}
-					
 					
 					$scope.dialogs.push(dialog);
 					
@@ -214,7 +76,7 @@ angular.module("ezdialog", ["ngAnimate"])
 					
 					dialog.isOpened = false;
 					
-					if (dialog.fake) {
+					if (!dialog.isDialog) {
 						$animate.removeClass(dialog.element, "show");
 					}
 					
@@ -228,37 +90,85 @@ angular.module("ezdialog", ["ngAnimate"])
 					}
 					return $scope.dialogs[last];
 				};
+				
+				this.open = function(dialog){
+					dialog.isDialog = true;
+					this.add(dialog);
+				};
 			}]
 		};
 	}])
-	.directive("ezdialogBody", function(){
+	.directive("ezdialogBody", ["$templateCache", "$compile", function($templateCache, $compile){
 		return {
-			restrict: "C",
-			scope: true,
-			template: "\
-				<span style=\"white-space: pre-wrap;\" ng-if=\"!dialog.template && !dialog.loaded\">{{dialog.msg}}</span>\
-				<span style=\"white-space: pre-wrap;\" ng-if=\"dialog.template && !dialog.loaded\">{{dialog.error || dialog.msg}}</span>\
-				<ng-include src=\"dialog.template\" onload=\"dialog.loaded=true\" ng-if=\"dialog.template\" />",
+			restrict: "A",
+			scope: {
+				ezdialogBody: "="
+			},
 			link: function(scope, element){
-				var dialog = scope.dialog, i, keys;
-				
-				if (!dialog.element) {
-					dialog.element = getParentByClass(element, "modal");
-				}
-				
-				if (!dialog.scope.param) {
-					dialog.scope.param = dialog.param;
-				}
-				
-				keys = Object.keys(dialog.scope);
-				for (i = 0; i < keys.length; i++) {
-					scope[keys[i]] = dialog.scope[keys[i]];
-				}
+				var dialog = scope.ezdialogBody;
+				var template = $templateCache.get(dialog.template);
+				element.html(template);
+				$compile(element.contents())(dialog.scope);
 			}
 		};
-	})
-	.factory("ezdialog", ["ezmodal", function($modal){
-		var conf = {
+	}])
+	.factory("ezdialog", ["$rootScope", "$compile", "$timeout", "$document", "$q",
+			function($rootScope, $compile, $timeout, $document, $q){
+		var dialogStack,
+			dialogStackElement = $compile("<div ezdialog-stack />")($rootScope),
+			dialogs = {};
+			
+		angular.element(document.body).append(dialogStackElement);
+		
+		// You can't access modalCtrl before DOM update.
+		$timeout(function(){
+			dialogStack = dialogStackElement.controller("ezdialogStack");
+		});
+		
+		$document.on("keydown", function(e){
+			var modal, inputs, dirty, next, i;
+			if (!dialogStack || !(modal = dialogStack.top()) || e.ctrlKey || e.altKey) {
+				return;
+			}
+			
+			if (e.keyCode == 27 && !e.shiftKey) {
+				$rootScope.$apply(function(){
+					modal.close();
+				});
+				e.preventDefault();
+			}
+			
+			if (e.keyCode == 13 && !modal.fake && !e.shiftKey) {
+				$rootScope.$apply(function(){
+					modal.ok();
+				});
+				e.preventDefault();
+			}
+			
+			if (e.keyCode == 9) {
+				inputs = modal.element[0].querySelectorAll("input, select, button, textarea, a, [tabindex]");
+				for (i = 0; i < inputs.length; i++) {
+					if (inputs[i] == document.activeElement) {
+						if (!e.shiftKey) {
+							next = (i + 1) % inputs.length;
+						} else {
+							next = (i - 1 + inputs.length) % inputs.length;
+						}
+						inputs[next].focus();
+						dirty = true;
+						break;
+					}
+				}
+				if (!dirty && inputs.length) {
+					inputs[0].focus();
+				}
+				e.preventDefault();
+			}
+		});
+
+		var scope = {};
+		
+		var conf = scope.conf = {
 			btn: {
 				ok: "OK",
 				cancel: "Cancel",
@@ -278,130 +188,137 @@ angular.module("ezdialog", ["ngAnimate"])
 				error: "An error occurred!"
 			},
 			size: "sm",
-			backdrop: "static"
+			toggleBackdrop: false,
+			handleEnter: true
 		};
-	
-		function dialog(opt){
-			var onclose = null, callback = {}, instance;
+		
+		var init = scope.init = function(dialog) {
+			switch (dialog.use) {
+				case "show":
+				case "error":
+					dialog.yes = dialog.yes || conf.btn.ok;
+					break;
+					
+				case "confirm":
+					dialog.yes = dialog.yes || conf.btn.ok;
+					dialog.no = dialog.no || conf.btn.cancel;
+					break;
+					
+				case "yesno":
+					dialog.yes = dialog.yes || conf.btn.yes;
+					dialog.no = dialog.no || conf.btn.no;
+					break;
+			}
 			
-			opt.size = opt.size || conf.size;
-			opt.callback = callback;
-			opt.scope = opt.scope || {};
-			instance = $modal.open(opt);
+			if (dialog.use == "error") {
+				dialog.type = "danger";
+			} else if (dialog.use) {
+				dialog.type = "primary";
+			} else {
+				dialog.type = "default";
+			}
 			
-			instance.result.then(function(value){
-				if (onclose) {
-					onclose(value);
+			dialog.deferred = $q.defer();
+			
+			var promise = dialog.deferred.promise;
+			
+			promise.ok = function(func){
+				dialog.onok = func;
+			};
+			
+			promise.cancel = function(func){
+				dialog.oncancel = func;
+			};
+			
+			promise.close = function(func){
+				dialog.onclose = func;
+			};
+			
+			promise.instance = dialog;
+			
+			dialog.close = function(value){
+				if (dialog.onclose) {
+					dialog.onclose(dialog.realClose);
+				} else {
+					dialog.realClose(value);
 				}
-			});
-			
-			function close(func){
-				onclose = func;
-				
-				return this;
-			}
-			
-			function ok(func){
-				callback.ok = func;
-				return this;
-			}
-			
-			function cancel(func){
-				callback.cancel = func;
-				return this;
-			}
-			
-			function addCallback(o){
-				angular.extend(callback, o);
-				return this;
-			}
-			
-			return {
-				close: close,
-				ok: ok,
-				cencel: cancel,
-				callback: addCallback,
-				instance: instance
 			};
-		}
-		
-		function error(msg, title){
-			var opt = {
-				title: title || conf.title.error,
-				msg: msg || conf.msg.error,
-				yes: conf.btn.ok,
-				type: "danger"
-			};
-			if (typeof msg == "object") {
-				opt.msg = conf.msg.error;
-				angular.extend(opt, msg);
-			}
-			return dialog(opt);
-		}
-		
-		function confirm(msg, title){
-			var opt = {
-				title: title || conf.title.confirm,
-				msg: msg || conf.msg.confirm,
-				yes: conf.btn.ok,
-				no: conf.btn.cancel,
-				type: "primary"
-			};
-			if (typeof msg == "object") {
-				opt.msg = conf.msg.confirm;
-				angular.extend(opt, msg);
-			}
-			return dialog(opt);
-		}
 			
-		function yesno(msg, title){
-			var opt = {
-				title: title || conf.title.yesno,
-				msg: msg || conf.msg.yesno,
-				yes: conf.btn.yes,
-				no: conf.btn.no,
-				type: "primary"
+			dialog.ok = function() {
+				if (dialog.onok) {
+					dialog.onok(dialog.realClose);
+				} else {
+					dialog.realClose(true);
+				}
 			};
-			if (typeof msg == "object") {
-				opt.msg = conf.msg.yesno;
-				angular.extend(opt, msg);
-			}
-			return dialog(opt);
-		}
-		
-		function show(msg, title){
-			var opt = {
-				title: title || conf.title.show,
-				msg: msg || conf.msg.show,
-				yes: conf.btn.ok,
-				type: "primary"
+			
+			dialog.cancel = function() {
+				if (dialog.oncancel) {
+					dialog.oncancel(dialog.realClose);
+				} else {
+					dialog.realClose(false);
+				}
 			};
-			if (typeof msg == "object") {
-				opt.msg = conf.msg.show;
-				angular.extend(opt, msg);
-			}
-			return dialog(opt);
-		}
-		
-		function create(opt){
-			// raw dialog
-			return dialog(opt);
-		}
-		
-		function setConf(opt){
-			angular.extend(conf, opt);
-			return this;
-		}
-		
-		return {
-			error: error,
-			confirm: confirm,
-			yesno: yesno,
-			show: show,
-			create: create,
-			conf: setConf,
-			configure: conf
+			
+			dialog.realClose = function(value){
+				dialogStack.remove(dialog);
+				dialog.deffered.resolve(value);
+			};
 		};
+		
+		function create(arg, title, use){
+			var dialog;
+			if (angular.isString(arg)) {
+				dialog = {
+					title: title,
+					msg: arg,
+					use: use
+				};
+			} else if (angular.isObject(arg)) {
+				dialog = {
+					use: use
+				};
+				angular.extend(dialog, arg);
+			}
+			
+			init(dialog);
+			
+			dialogStack.open(dialog);
+			
+			return dialog.deferred.promise;
+		}
+		
+		scope.error = function(arg, title){
+			return create(arg, title, "error");
+		};
+		
+		scope.confirm = function(arg, title){
+			return create(arg, title, "confirm");
+		};
+		
+		scope.yesno = function(arg, title){
+			return create(arg, title, "yesno");
+		};
+		
+		scope.show = function(arg, title){
+			return create(arg, title, "show");
+		};
+		
+		scope.register = function(dialog){
+			dialogs[dialog.id] = dialog;
+		};
+		
+		scope.toggle = function(id){
+			var dialog = dialogs[id];
+			
+			if (!dialog.isOpened) {
+				dialogStack.add(dialog);
+			} else {
+				dialogStack.remove(dialog);
+			}
+		};
+		
+		return scope;
 	}])
 	.directive("ngDestroy", function(){
 		return {
@@ -416,146 +333,64 @@ angular.module("ezdialog", ["ngAnimate"])
 			}
 		};
 	})
-	.directive("ezmodal", ["ezmodal", function(ezmodal){
-		return {
-			restrict: "E",
-			transclude: true,
-			template: 
-				'<div class="modal-dialog" tabindex="-1" role="dialog">\
-					<div class="modal-content" ng-transclude></div>\
-				</div>',
-			scope: {
-				id: "@",
-				size: "@",
-				backdropToggle: "@"
-			},
-			link: function(scope, element, attrs){
-				var fakeDialog = {
-					fake: true,
-					size: attrs.size,
-					id: attrs.id,
-					element: element
-				};
-				element.addClass("modal");
-				if (attrs.size) {
-					angular.element(element[0].querySelector(".modal-dialog")).addClass("modal-" + attrs.size);
-				}
-				if (attrs.backdropToggle !== undefined) {
-					element.on("click", function(e){
-						if (e.target == this) {
-							scope.$apply(function(){
-								ezmodal.toggle(fakeDialog);
-							});
-						}
-					});
-				}
-				ezmodal.register(fakeDialog);
-			}
-		};
-	}])
-	.directive("ezmodalToggle", ["ezmodal", function(ezmodal){
+	.directive("ezdialogToggle", ["ezdialog", function(ezdialog){
 		return {
 			restrict: "A",
 			link: function(scope, element, attrs){
 				element.on("click", function(){
 					scope.$apply(function(){
-						var id = attrs.ezmodalToggle;
-						ezmodal.toggle(id);
+						var id = attrs.ezdialogToggle;
+						ezdialog.toggle(id);
 					});
 				});
 			}
 		};
 	}])
-	.directive("ezdialog", function(ezdialog, ezmodal){
+	.directive("ezdialog", function(ezdialog){
 		return {
-			restrict: "E",
+			restrict: "A",
 			transclude: true,
-			template: 
-				'<div class="modal-dialog" ng-class="\'modal-\' + (size || default.size)" tabindex="-1" role="dialog">\
-					<div class="modal-content">\
-						<form role="form" name="form">\
-							<div class="modal-header">\
-								<h3 class="modal-title">{{title}}</h3>\
-							</div>\
-							<div class="modal-body" ng-transclude></div>\
-							<div class="modal-footer">\
-								<button class="btn" ng-class="\'btn-\' + theme" ng-click="instance.ok()" type="submit" ng-if="yes!==undefined" ng-disabled="form.$invalid">{{yes}}</button>\
-								<button class="btn btn-default" ng-click="instance.cancel()" type="button" ng-if="no!==undefined">{{no}}</button>\
-							</div>\
-						</form>\
-					</div>\
-				</div>',
+			templateUrl: "templates/ezdialog.html",
 			scope: {
-				id: "@",
+				id: "@ezdialog",
 				size: "@",
 				backdropToggle: "@",
 				title: "@",
 				type: "@",
+				use: "@",
 				onclose: "&",
 				oncancel: "&",
 				onok: "&",
 				yes: "@",
 				no: "@"
 			},
-			link: function(scope, element, attrs){
+			link: function(scope, element){
 				if (!scope.id) {
 					throw "ezdialog directive requires 'id' attribute";
 				}
-				if (!scope.type) {
-					throw "ezdialog directive requires 'type' attribute";
-				}
-				if (!scope.title) {
-					scope.title = ezdialog.configure.title[scope.type];
-				}
-				switch (scope.type) {
-					case "show":
-					case "error":
-						scope.yes = scope.yes || ezdialog.configure.btn.ok;
-						break;
-						
-					case "confirm":
-						scope.yes = scope.yes || ezdialog.configure.btn.ok;
-						scope.no = scope.no || ezdialog.configure.btn.cancel;
-						break;
-						
-					case "yesno":
-						scope.yes = scope.yes || ezdialog.configure.btn.yes;
-						scope.no = scope.no || ezdialog.configure.btn.no;
-						break;
-				}
-				scope.theme = "primary";
-				
-				if (scope.type == "error") {
-					scope.theme = "danger";
-				}
 				
 				scope.default = ezdialog.configure;
+				scope.element = element;
 				
-				scope.fake = {
-					fake: true,
-					id: scope.id,
-					element: element,
-					handleEnter: true,
-					callback: {
-						ok: scope.onok,
-						cancel: scope.oncancel,
-						close: scope.onclose
-					}
-				};
-				
-				element.addClass("modal modal-" + scope.theme);
-				
-				if (scope.backdropToggle !== undefined) {
-					element.on("click", function(e){
-						if (e.target == this) {
-							scope.$apply(function(){
-								scope.instance.close();
-							});
-						}
-					});
+				if (scope.backdropToggle === undefined) {
+					scope.backdropToggle = false;
+				} else {
+					scope.backdropToggle = true;
 				}
 				
-				ezmodal.register(scope.dialog);
+				ezdialog.init(scope);
+				
+				element.addClass("modal modal-" + scope.type);
+
+				element.on("click", function(e){
+					if (e.target == this && scope.backdropToggle) {
+						scope.$apply(function(){
+							scope.close();
+						});
+					}
+				});
+				
+				ezdialog.register(scope);
 			}
 		};
 	});

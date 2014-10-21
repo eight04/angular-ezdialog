@@ -6,7 +6,7 @@ module.exports = function(grunt) {
     uglify: {
 		minified: {
 			files: {
-				"dist/dialog.min.js": "dialog.js"
+				"dist/dialog.min.js": "dist/dialog.js"
 			},
 			options: {
 				mangle: true,
@@ -44,6 +44,16 @@ module.exports = function(grunt) {
 				"dist/dialog.js": "dialog.js"
 			}
 		}
+	},
+	ngtemplates: {
+		template: {
+			src: "templates/*",
+			options: {
+				collapseWhitespace: true,
+				module: "ezdialog",
+				append: "dist/dialog.js"
+			}
+		}
 	}
   });
 
@@ -52,8 +62,9 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-less');
   grunt.loadNpmTasks('grunt-eslint');
   grunt.loadNpmTasks('grunt-contrib-copy');
+  grunt.loadNpmTasks('grunt-angular-templates');
 
   // Default task(s).
-  grunt.registerTask('default', ["eslint", 'uglify', "copy", "less"]);
+  grunt.registerTask('default', ["eslint", "copy", "less", "ngtemplates", 'uglify']);
 
 };

@@ -69,13 +69,13 @@
 		
 		<h3>Use ezdialog directive</h3>
 		<button class="btn btn-default" ezmodal-toggle="my-dialog">Toggle dialog</button>
-		<ezdialog id="my-dialog" title="Ezdialog directive" size="sm" type="confirm" onclose="dialog.show('closed')" onok="dialog.show('ok')" oncancel="dialog.show('cancel')" yes="YEEES" no="NOOOO" backdrop-toggle>
+		<div ezdialog="my-dialog" title="Ezdialog directive" size="sm" type="confirm" onclose="dialog.show('closed')" onok="dialog.show('ok')" oncancel="dialog.show('cancel')" yes="YEEES" no="NOOOO" backdrop-toggle>
 			Hi!
-		</ezdialog>
+		</div>
 		
 		<h3>Use ezmodal directive</h3>
 		<button class="btn btn-default" ezmodal-toggle="modal1">Toggle modal</button>
-		<ezmodal id="modal1" backdrop-toggle>
+		<div ezmodal="modal1" backdrop-toggle>
 			<div class="modal-header">
 				<button type="button" class="close" ezmodal-toggle="modal1">
 					<span aria-hidden="true">&times;</span>

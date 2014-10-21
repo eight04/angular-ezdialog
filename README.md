@@ -175,6 +175,25 @@ ezmodal direcive:
 -->
 ```
 
+Dialog API
+----------
+```javascript
+var dialog = {
+	id: "string",
+	size: "sm|md|lg",
+	backdropToggle: "boolean",
+	title: "string",
+	type: "primary|success|info|warning|danger",
+	use: "show|error|confirm|yesno",
+	onclose: "function",
+	oncancel: "function",
+	onok: "function",
+	yes: "string",
+	no: "string",
+	element: "HTML Element"
+};
+```
+
 Todos
 -----
 * <del>Enhance enter key press behavior.</del> Done!
