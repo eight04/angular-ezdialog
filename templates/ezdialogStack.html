@@ -4,12 +4,16 @@
 		<div class="modal-content">
 			<form role="form" name="form">
 				<div class="modal-header">
-					<h3 class="modal-title">{{dialog.title || default.title[dialog.use]}}</h3>
+					<button class="close" ng-click="dialog.close()">
+						&times;
+						<span class="sr-only">Close dialog</span>
+					</button>
+					<h4 class="modal-title">{{dialog.title || default.title[dialog.use]}}</h4>
 				</div>
 				<div class="modal-body">
-					<span style="white-space: pre-wrap;" ng-if="!dialog.template && !dialog.loaded">{{dialog.msg}}</span>
+					<span style="white-space: pre-wrap;" ng-if="!dialog.template && !dialog.loaded">{{dialog.msg || default.msg[dialog.use]}}</span>
 					<span style="white-space: pre-wrap;" ng-if="dialog.template && !dialog.loaded">{{dialog.error || dialog.msg}}</span>
-					<div ezdialog-body ng-if="dialog.template"></div>
+					<div ezdialog-copy-scope ng-if="dialog.template" ng-include="dialog.template"></div>
 				</div>
 				<div class="modal-footer">
 					<button class="btn" ng-class="'btn-' + (dialog.type || 'default')" ng-click="dialog.ok()" ng-if="dialog.yes !== undefined" ng-disabled="form.$invalid">{{dialog.yes}}</button>

@@ -8,7 +8,7 @@ angular.module("ezdialog", ["ngAnimate"])
 			restrict: "A",
 			templateUrl: "templates/ezdialogStack.html",
 			scope: {},
-			controller: ["$scope", "$document", function($scope, $document){
+			controller: ["$scope", "$document", "ezdialog", function($scope, $document, ezdialog){
 				$scope.dialogs = [];
 				
 				$scope.default = ezdialog.conf;
@@ -100,20 +100,24 @@ angular.module("ezdialog", ["ngAnimate"])
 			}]
 		};
 	}])
-	.directive("ezdialogBody", ["$templateCache", "$compile", function($templateCache, $compile){
+	.directive("ezdialogCopyScope", function(){
 		return {
 			restrict: "A",
-			scope: {
-				ezdialogBody: "="
-			},
-			link: function(scope, element){
-				var dialog = scope.ezdialogBody;
-				var template = $templateCache.get(dialog.template);
-				element.html(template);
-				$compile(element.contents())(dialog.scope);
+			scope: true,
+			link: function(scope){
+				var dialog = scope.dialog, keys, i;
+				
+				if (!dialog.scope) {
+					return;
+				}
+				
+				keys = Object.keys(dialog.scope);
+				for (i = 0; i < keys.length; i++) {
+					scope[keys[i]] = dialog.scope[keys[i]];
+				}
 			}
 		};
-	}])
+	})
 	.factory("ezdialog", ["$rootScope", "$compile", "$timeout", "$document", "$q",
 			function($rootScope, $compile, $timeout, $document, $q){
 		var dialogStack,
@@ -212,12 +216,14 @@ angular.module("ezdialog", ["ngAnimate"])
 					break;
 			}
 			
-			if (dialog.use == "error") {
-				dialog.type = "danger";
-			} else if (dialog.use) {
-				dialog.type = "primary";
-			} else {
-				dialog.type = "default";
+			if (!dialog.type) {
+				if (dialog.use == "error") {
+					dialog.type = "danger";
+				} else if (dialog.use) {
+					dialog.type = "primary";
+				} else {
+					dialog.type = "default";
+				}
 			}
 			
 			dialog.deferred = $q.defer();
@@ -240,7 +246,7 @@ angular.module("ezdialog", ["ngAnimate"])
 			
 			dialog.close = function(value){
 				if (dialog.onclose) {
-					dialog.onclose(dialog.realClose);
+					dialog.onclose(dialog.realClose, value);
 				} else {
 					dialog.realClose(value);
 				}
@@ -345,6 +351,23 @@ angular.module("ezdialog", ["ngAnimate"])
 		};
 	}])
 	.directive("ezdialog", ["ezdialog", function(ezdialog){
+		function wrapCallback(func, dialog){
+			return function(done){
+				var prevented = false,
+					event = {
+						preventDefault: function(){
+							prevented = true;
+						}
+					};
+					
+				func({$dialog: dialog, $event: event});
+				
+				if (!prevented) {
+					done();
+				}
+			};
+		}
+	
 		return {
 			restrict: "A",
 			transclude: true,
@@ -352,8 +375,7 @@ angular.module("ezdialog", ["ngAnimate"])
 			scope: {
 				id: "@ezdialog",
 				size: "@",
-				backdropToggle: "@",
-				title: "@",
+				title: "@ezdialogTitle",
 				type: "@",
 				use: "@",
 				onclose: "&",
@@ -362,7 +384,7 @@ angular.module("ezdialog", ["ngAnimate"])
 				yes: "@",
 				no: "@"
 			},
-			link: function(scope, element){
+			link: function(scope, element, attrs){
 				if (!scope.id) {
 					throw "ezdialog directive requires 'id' attribute";
 				}
@@ -370,11 +392,15 @@ angular.module("ezdialog", ["ngAnimate"])
 				scope.default = ezdialog.configure;
 				scope.element = element;
 				
-				if (scope.backdropToggle === undefined) {
+				if (attrs.backdropToggle === undefined) {
 					scope.backdropToggle = false;
 				} else {
 					scope.backdropToggle = true;
 				}
+				
+				scope.onok = wrapCallback(scope.onok, scope);
+				scope.oncancel = wrapCallback(scope.oncancel, scope);
+				scope.onclose = wrapCallback(scope.onclose, scope);
 				
 				ezdialog.init(scope);
 				
