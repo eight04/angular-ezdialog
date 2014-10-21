@@ -1,6 +1,3 @@
-ezdialog-modal .modal {
-  display: block;
-}
 @media (min-width: 768px) {
   .modal {
     text-align: center;
@@ -31,50 +28,39 @@ ezdialog-modal .modal {
 .modal-backdrop.ng-leave.ng-leave-active {
   opacity: 0;
 }
-.modal.ng-enter {
+.modal.ng-enter,
+.modal.show-add {
   transition: 0.4s;
 }
-.modal.ng-enter .modal-dialog {
-  opacity: 0;
-  transform: translateY(-25%);
-}
-.modal.ng-enter.ng-enter-active .modal-dialog {
-  transition: 0.4s all ease;
-  transform: none;
-  opacity: 1;
-}
-.modal.ng-leave {
-  transition: 0.2s;
-}
-.modal.ng-leave .modal-dialog {
-  opacity: 1;
-}
-.modal.ng-leave.ng-leave-active .modal-dialog {
-  transition: 0.2s all ease;
-  transform: translateY(-25%);
-  opacity: 0;
-}
-.modal.show-add {
-  transition: 0.4s all ease;
-  display: block;
-}
+.modal.ng-enter .modal-dialog,
 .modal.show-add .modal-dialog {
   opacity: 0;
   transform: translateY(-25%);
 }
-.modal.show-add.show-add-active .modal-dialog {
+.modal.ng-enter-active .modal-dialog,
+.modal.show-add-active .modal-dialog {
   transition: 0.4s all ease;
+  transform: none;
+  opacity: 1;
+}
+.modal.ng-leave,
+.modal.show-remove {
+  transition: 0.2s;
+}
+.modal.ng-leave .modal-dialog,
+.modal.show-remove .modal-dialog {
   opacity: 1;
   transform: none;
 }
-.modal.show-remove {
-  transition: 0.4s all ease;
-  display: block;
-}
-.modal.show-remove.show-remove-active .modal-dialog {
+.modal.ng-leave-active .modal-dialog,
+.modal.show-remove-active .modal-dialog {
   transition: 0.2s all ease;
-  opacity: 0;
   transform: translateY(-25%);
+  opacity: 0;
+}
+.modal.show-add,
+.modal.show-remove {
+  display: block;
 }
 .modal-primary .modal-header {
   background-color: #428bca;

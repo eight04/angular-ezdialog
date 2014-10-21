@@ -1,13 +1,8 @@
 @import "bower_components/bootstrap/less/variables.less";
 
-.modal {
-	// Use angular to create/destroy dialogs
-	ezdialog-modal & {
-		display: block;
-	}
-	
-	// Vertical center
-	@media (min-width: @screen-sm-min) {
+// Vertical center
+@media (min-width: @screen-sm-min) {
+	.modal {
 		text-align: center;
 		&:before {
 			content: "";
@@ -51,7 +46,7 @@
 		transform: translateY(-25%);
 	}
 	
-	&.ng-enter-active .modal-dialog{
+	&-active .modal-dialog{
 		transition: 0.4s all ease;
 		transform: none;
 		opacity: 1;
@@ -63,40 +58,19 @@
 	
 	.modal-dialog {
 		opacity: 1;
+        transform: none;
 	}
 	
-	&.ng-leave-active .modal-dialog {
+	&-active .modal-dialog {
 		transition: 0.2s all ease;
 		transform: translateY(-25%);
 		opacity: 0;
 	}
 }
 
-.modal.show-add {
-	transition: 0.4s all ease;
+.modal.show-add:extend(.modal.ng-enter all), 
+.modal.show-remove:extend(.modal.ng-leave all) {
 	display: block;
-	
-	.modal-dialog {
-		opacity: 0;
-		transform: translateY(-25%);
-	}
-	
-	&.show-add-active .modal-dialog {
-		transition: 0.4s all ease;
-		opacity: 1;
-		transform: none;
-	}
-}
-
-.modal.show-remove {
-	transition: 0.4s all ease;
-	display: block;
-	
-	&.show-remove-active .modal-dialog {
-		transition: 0.2s all ease;
-		opacity: 0;
-		transform: translateY(-25%);
-	}
 }
 
 // Header color
