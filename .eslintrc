@@ -4,9 +4,11 @@
 	},
 	rules: {
 		"no-trailing-spaces": 0,
-		"eqeqeq": 0
+		"eqeqeq": 0,
+		"no-console": 1
 	},
 	globals: {
-		angular: false
+		angular: false,
+		console: false
 	}
 }

@@ -47,11 +47,15 @@ module.exports = function(grunt) {
 	},
 	ngtemplates: {
 		template: {
-			src: "templates/*",
+			src: "templates/**.html",
+			dest: "dist/dialog.js",
 			options: {
-				collapseWhitespace: true,
+				htmlmin: {
+					collapseWhitespace: true,
+					removeComments: true
+				},
 				module: "ezdialog",
-				append: "dist/dialog.js"
+				append: true
 			}
 		}
 	}

@@ -1,5 +1,5 @@
 <div class="modal-backdrop in" ng-style="{'z-index': getBackdropZ()}" ng-if="dialogs.length" ng-destroy="backdropCleanup()"></div>
-<div class="modal" ng-class="'modal-' + (dialog.type || 'default')" ng-repeat="dialog in dialogs | filter:{isDialog:true}" ng-style="{'z-index': dialog.zIndex}" ng-click="backdropToggle(dialog)"><!--
+<div class="modal show" ng-class="'modal-' + (dialog.type || 'default')" ng-repeat="dialog in dialogs | filter:{isDialog:true}" ng-style="{'z-index': dialog.zIndex}" ng-click="backdropToggle(dialog)" ezdialog-bind-element="dialog"><!--
 	--><div class="modal-dialog" ng-class="'modal-' + (dialog.size || default.size)" tabindex="-1" role="dialog">
 		<div class="modal-content">
 			<form role="form" name="form">
