@@ -15,7 +15,7 @@ angular.module("ezdialog", ["ngAnimate"])
 				
 				$scope.backdropToggle = function(dialog){
 					if (dialog.toggleBackdrop) {
-						dialog.close();
+						dialog.cancel();
 					}
 				};
 				
@@ -139,7 +139,7 @@ angular.module("ezdialog", ["ngAnimate"])
 			
 			if (e.keyCode == 27 && !e.shiftKey) {
 				$rootScope.$apply(function(){
-					modal.close();
+					modal.cancel();
 				});
 				e.preventDefault();
 			}
@@ -245,26 +245,24 @@ angular.module("ezdialog", ["ngAnimate"])
 			promise.instance = dialog;
 			
 			dialog.close = function(value){
-				if (dialog.onclose) {
-					dialog.onclose(dialog.realClose, value);
-				} else {
+				if (!dialog.onclose || dialog.onclose(value) !== false) {
 					dialog.realClose(value);
 				}
 			};
 			
 			dialog.ok = function() {
 				if (dialog.onok) {
-					dialog.onok(dialog.realClose);
+					dialog.onok(dialog.close);
 				} else {
-					dialog.realClose(true);
+					dialog.close(true);
 				}
 			};
 			
 			dialog.cancel = function() {
 				if (dialog.oncancel) {
-					dialog.oncancel(dialog.realClose);
+					dialog.oncancel(dialog.close);
 				} else {
-					dialog.realClose(false);
+					dialog.close(false);
 				}
 			};
 			
@@ -318,7 +316,8 @@ angular.module("ezdialog", ["ngAnimate"])
 			if (!dialog.isOpened) {
 				dialogStack.add(dialog);
 			} else {
-				dialogStack.remove(dialog);
+				// dialogStack.remove(dialog);
+				dialog.cancel();
 			}
 		};
 		
@@ -351,23 +350,6 @@ angular.module("ezdialog", ["ngAnimate"])
 		};
 	}])
 	.directive("ezdialog", ["ezdialog", function(ezdialog){
-		function wrapCallback(func, dialog){
-			return function(done){
-				var prevented = false,
-					event = {
-						preventDefault: function(){
-							prevented = true;
-						}
-					};
-					
-				func({$dialog: dialog, $event: event});
-				
-				if (!prevented) {
-					done();
-				}
-			};
-		}
-	
 		return {
 			restrict: "A",
 			transclude: true,
@@ -398,9 +380,39 @@ angular.module("ezdialog", ["ngAnimate"])
 					scope.backdropToggle = true;
 				}
 				
-				scope.onok = wrapCallback(scope.onok, scope);
-				scope.oncancel = wrapCallback(scope.oncancel, scope);
-				scope.onclose = wrapCallback(scope.onclose, scope);
+				if (scope.onok) {
+					scope.onok = function(func){
+						return function(){
+							func({$dialog: scope});
+						};
+					}(scope.onok);
+				}
+				
+				if (scope.oncancel) {
+					scope.oncancel = function(func){
+						return function(){
+							func({$dialog: scope});
+						};
+					}(scope.oncancel);
+				}
+
+				if (scope.onclose) {
+					scope.onclose = function(func){
+						return function(value){
+							var prevented = false,
+								event = {
+									data: value,
+									preventDefault: function(){
+										prevented = true;
+									}
+								};
+							func({$event: event, $dialog: scope});
+							if (prevented) {
+								return false;
+							}
+						};
+					}(scope.onclose);
+				}
 				
 				ezdialog.init(scope);
 				
@@ -409,7 +421,7 @@ angular.module("ezdialog", ["ngAnimate"])
 				element.on("click", function(e){
 					if (e.target == this && scope.backdropToggle) {
 						scope.$apply(function(){
-							scope.close();
+							scope.cancel();
 						});
 					}
 				});

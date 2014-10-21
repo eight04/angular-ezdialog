@@ -68,7 +68,7 @@
 		
 		<h3>Use ezdialog directive</h3>
 		<button class="btn btn-default" ezdialog-toggle="my-dialog">Toggle dialog</button>
-		<div ezdialog="my-dialog" ezdialog-title="Ezdialog directive" size="sm" type="warning" onclose="dialog.show('') && $event.preventDefault()" onok="dialog.show($dialog.title)" oncancel="dialog.show('cancel')" yes="YEEES" no="NOOOO" backdrop-toggle>
+		<div ezdialog="my-dialog" ezdialog-title="Ezdialog directive" size="md" type="warning" onok="dialog.show('Use $dialog.close() to close dialog manually.') && $dialog.close()" oncancel="dialog.show('cancel')" yes="YEEES" no="NOOOO" backdrop-toggle>
 			<pre>$scope.number = {{number}}<br>$scope.input.number = {{input.number}}<br>$parent.dialog.scope = {{dialog.scope|json}}</pre>
 			<input type="text" class="form-control" ng-model="number" required>
 		</div>
