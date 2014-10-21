@@ -132,3 +132,5 @@ Todos
 * <del>Add ezmodal service and directive.</del> Done!
 * <del>Add onclose attribute to overide default ESC key behavior.</del> Changed. Now ESC key will trigger dialog.cancel().
 * Add focus stack to trace actived element when opening new dialog.
+* Support httpRequest loading message on ng-include.
+
