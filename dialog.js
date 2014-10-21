@@ -194,8 +194,7 @@ angular.module("ezdialog", ["ngAnimate"])
 				error: "An error occurred!"
 			},
 			size: "sm",
-			toggleBackdrop: false,
-			handleEnter: true
+			toggleBackdrop: false
 		};
 		
 		var init = scope.init = function(dialog) {
@@ -232,14 +231,17 @@ angular.module("ezdialog", ["ngAnimate"])
 			
 			promise.ok = function(func){
 				dialog.onok = func;
+				return this;
 			};
 			
 			promise.cancel = function(func){
 				dialog.oncancel = func;
+				return this;
 			};
 			
 			promise.close = function(func){
 				dialog.onclose = func;
+				return this;
 			};
 			
 			promise.instance = dialog;

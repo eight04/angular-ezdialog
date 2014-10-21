@@ -1,10 +1,10 @@
 angular-ezdialog
 ================
-A simple AngularJS dialog service build with Bootstrap modal and ngAnimate. This service was aimed to replace native `window.alert`.
+A simple AngularJS dialog service build with Bootstrap modal and ngAnimate, aiming to replace native `window.alert`.
 
 Demo
 ----
-You can check the demo [here][1].
+Check the [demo page][1] for usage example.
 
 [1]: https://rawgit.com/eight04/angular-ezdialog/master/example/example.html
 
@@ -14,189 +14,120 @@ Install with bower:
 ```sh
 bower install angular-ezdialog --save
 ```
-In html head:
+In html header:
 ```html
 <script src="bower_components/angular-ezdialog/dist/dialog.min.js">
 <link rel="stylesheet" href="bower_components/angular-ezdialog/dist/dialog.min.css">
 ```
 The css file was built with official bootstrap v3.2.0. Create your own build for custom dialog color.
 
-Usage
------
-Use ezdialog service:
-```JavaScript
-// Pop a simple error
-ezdialog.error("error");
+Ezdialog service
+----------------
+Injectable service `ezdialog`.
 
-// With title
-ezdialog.error("error", "Something went wrong");
+#### ezdialog.show(String message[, String title]) or ezdialog.show(Object options) -> Promise object
 
-// Do something after dialog close
-ezdialog.error("error").close(function(ret){
-    // ok -> true, cencel -> false
-    ezdialog.show("dialog closed! returned value: " + ret);
-});
+`ezdialog.show`, `ezdialog.error`, `ezdialog.confirm`, `ezdialog.yesno` all accept same arguments.
 
-// Replace default button click handler
-ezdialog.confirm()
-    .ok(function(){
-        ezdialog.show("OK");
-        this.close();
-    })
-    .cancel(function(){
-        ezdialog.show("press Yes to close dialog");
-    });
+Display a simple dialog, containing title and message.
 
-// Change default setting, which will affect all dialog globally.
-ezdialog.conf({
-    size: "lg",
-    title: {
-        show: "show time!"
-    }
-}).show();
-
-// Call method with option object.
-ezdialog.show({
-    title: "my title",
-    msg: "my message",
-    size: "md",
-    yes: "yes button text",
-    no: "no button text"
-});
-
-// Use a custom template. Template will be included in dialog body.
-ezdialog.show({
-	title: "use template",
-	template: "my-dialog.html"
-});
-```
-After version 2.0, ezdialog has its own modal service `ezmodal`:
 ```javascript
-ezmodal.toggle("my-modal");
-```
-And directive:
-```html
-<button ezmodal-toggle="my-modal">Open modal</button>
-
-<ezmodal id="my-modal" size="sm" backdrop-toggle>
-	<div class="modal-header">
-    	...
-    </div>
-    <div class="modal-body">
-    	...
-    </div>
-</ezmodal>
-```
-Check the demo page for more examples.
-
-Service Methods
----------------
-```JavaScript
-// There are 5 methods to display dialog
-ezdialog.error()
-ezdialog.show()
-ezdialog.confirm()
-ezdialog.yesno()	// same as confirm, but button text setted as Yes/No instead of OK/Cancel.
-
-// These methods will return a dialog instance. You can provide some callbacks.
-// You have to call this.close() in ok/cancel callback to close dialog.
-dialogInstance.confirm()
-	.ok(func)		// call when click on ok button
-	.cancel(func)	// call when click on cancel button
-	.close(func)	// after dialog close.
-
-// Use ezmodal service to toggle modal.
-ezmodal.toggle(id)
-```
-
-Options
--------
-```JavaScript
-// Default config. Define default button text, title, message...
-// Change it with dialog.conf()
-var conf = {
-	btn: {
-		ok: "OK",
-		cancel: "Cancel",
-		yes: "Yes",
-		no: "No"
-	},
-	title: {
-		show: "Info",
-		confirm: "Confirm",
-		yesno: "Confirm",
-		error: "Error"
-	},
-	msg: {
-		show: "Hi!",
-		confirm: "Are you sure?",
-		yesno: "Yes or no?",
-		error: "An error occurred!"
-	},
-	size: 'sm'
-};
-
-// The option object you can pass to ezdialog's methods
-var opt = {
-	title: "title",
+// Default options object
+options = {
+	use: "show",	// Could be show|error|confirm|yesno. Ezdialog will apply some
+    				// default options according its value.
 	msg: "message",
+    title: "title",
 
-	// button text
-	yes: "OK",
-	no: "Cancel",
+    // Button click handler. Check callback section for more information.
+    onok: function(){},
+    oncancel: function(){},
 
-	// dialog type. primary|success|info|warning|danger
-	type: "primary",
+    // Text content on buttons
+    yes: "OK",
+    no: "Cancel",
 
-	// dialog size. sm|md|lg
-	size: "sm"
-
-	// Use custom template in dialog body
-	template: "template.html",
-    // Show if failed to load template
-    error: "error message",
-    // Variables to bind to isolate dialog scope
-    scope: {
-    	number: 999
-    }
+    size: "sm",				// Could be sm|md|lg.
+    toggleBackdrop: false	// Decided whether to close dialog when clicking
+    						// on backdrop.
 };
 ```
-ezmodal direcive:
+
+#### ezdialog.toggle(String id)
+Show/hide a dialog which was created by ezdialogDirective.
+
+#### ezdialog.conf
+An object contains ezdialog's default value.
+
+Dialog promise
+--------------
+A promise returned by ezdialog.show. (.error, .confirm, ...)
+
+#### promise.then(Function callback(retValue))
+Trigger when dialog is closed. By the default, ok button will set retValue to true, otherwise false.
+
+#### promise.ok(Function callback(Function closeFunc)) -> self
+Replace the default ng-click callback. To close the dialog, run `closeFunc()`. This has the same effect as `options.onok = callback`.
+
+#### promise.cancel(Function callback(Function closeFunc)) -> self
+Same as above.
+
+#### promise.instance
+Dialog instance object.
+
+Dialog instance
+---------------
+You can get it from `promise.instance`.
+
+#### dialog.ok()
+By the default, this is same as `dialog.close(true)`. Otherwise it will call `onok` function.
+
+#### dialog.cancel()
+By the default, this is same as `dialog.close(false)`.
+
+#### dialog.close(value)
+Close the dialog and resolve the deferred with `value`.
+
+Ezdialog directive
+------------------
 ```html
-<button ezmodal-toggle="my-modal">Toggle modal</button>
-<!--
-	ezmodal-toggle: String. Modal's id.
--->
-
-<ezmodal id="my-modal" size="md" backdrop-toggle></ezmodal>
-<!--
-	size: Value could be sm|md|lg. Set modal's size.
-    backdrop-toggle: Optional. If given, modal will be closed when clicking on the backdrop.
--->
+<button ezdialog-toggle="my-modal">Open dialog</button>
+<div
+    ezdialog="my-modal"
+    ezdialog-title="Title"
+    size="sm"
+    type="success"
+    yes="OK"
+    no="Cancel"
+    onok="doSomething($dialog)"
+    oncancel="doSomething($dialog)"
+    backdrop-toggle>
+	...
+</div>
 ```
 
-Dialog API
-----------
-```javascript
-var dialog = {
-	id: "string",
-	size: "sm|md|lg",
-	backdropToggle: "boolean",
-	title: "string",
-	type: "primary|success|info|warning|danger",
-	use: "show|error|confirm|yesno",
-	onclose: "function",
-	oncancel: "function",
-	onok: "function",
-	yes: "string",
-	no: "string",
-	element: "HTML Element"
-};
-```
+#### ezdialog-toggle = "id"
+Dialog id which you want to toggle.
+
+#### ezdialog = "id"
+Create a dialog and set dialog id.
+
+#### ezdialog-title = "title"
+Set dialog title.
+
+#### size, type, yes, no
+Dialog options, same as options object above.
+
+#### onok = Expression, oncancel = Expression
+Replace default onok, oncancel callback. You can access dialog instance with `$dialog` to `$dialog.close()` manually.
+
+#### backdrop-toggle
+Provide backdrop-toggle attribute to close dialog when clicking on backdrop.
+
 
 Todos
 -----
 * <del>Enhance enter key press behavior.</del> Done!
 * <del>Remove ui.bootstrap dependency and use ngAnimate.</del> Done!
 * <del>Add ezmodal service and directive.</del> Done!
-* Add onclose attribute to overide default ESC key behavior.
+* <del>Add onclose attribute to overide default ESC key behavior.</del> Changed. Now ESC key will trigger dialog.cancel().
