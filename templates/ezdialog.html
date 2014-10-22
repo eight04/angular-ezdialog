@@ -2,16 +2,16 @@
 	<div class="modal-content">
 		<form role="form" name="form">
 			<div class="modal-header">
-				<button class="close" ng-click="close()">
+				<button class="close" ng-click="cancel()">
 					&times;
 					<span class="sr-only">Close dialog</span>
 				</button>
-				<h4 class="modal-title">{{title || default.title[type]}}</h4>
+				<h4 class="modal-title">{{title || default.title[use]}}</h4>
 			</div>
 			<div class="modal-body" ng-transclude></div>
 			<div class="modal-footer">
-				<button class="btn" ng-class="'btn-' + type" ng-click="ok()" type="submit" ng-if="yes!==undefined" ng-disabled="form.$invalid">{{yes}}</button>
-				<button class="btn btn-default" ng-click="cancel()" type="button" ng-if="no!==undefined">{{no}}</button>
+				<button class="btn" ng-class="'btn-' + (type || default.type[use])" ng-click="ok()" type="submit" ng-if="yes !== undefined || !!default.btn[use].yes" ng-disabled="form.$invalid">{{yes || default.btn[use].yes}}</button>
+				<button class="btn btn-default" ng-click="cancel()" type="button" ng-if="no !== undefined || !!default.btn[use].no">{{no || default.btn[use].no}}</button>
 			</div>
 		</form>
 	</div>

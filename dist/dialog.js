@@ -174,17 +174,27 @@ angular.module("ezdialog", ["ngAnimate"])
 
 		var scope = {};
 		
-		var conf = scope.conf = {
+		scope.conf = {
 			btn: {
-				ok: "OK",
-				cancel: "Cancel",
-				yes: "Yes",
-				no: "No"
+				show: {
+					yes: "OK"
+				},
+				confirm: {
+					yes: "OK",
+					no: "Cancel"
+				},
+				yesno: {
+					yes: "Yes",
+					no: "No"
+				},
+				error: {
+					yes: "OK"
+				}
 			},
 			title: {
 				show: "Info",
 				confirm: "Confirm",
-				yesno: "Confirm",
+				yesno: "Question",
 				error: "Error"
 			},
 			msg: {
@@ -193,38 +203,17 @@ angular.module("ezdialog", ["ngAnimate"])
 				yesno: "Yes or no?",
 				error: "An error occurred!"
 			},
+			type: {
+				show: "info",
+				confirm: "primary",
+				yesno: "warning",
+				error: "danger"
+			},
 			size: "sm",
 			toggleBackdrop: false
 		};
 		
-		var init = scope.init = function(dialog) {
-			switch (dialog.use) {
-				case "show":
-				case "error":
-					dialog.yes = dialog.yes || conf.btn.ok;
-					break;
-					
-				case "confirm":
-					dialog.yes = dialog.yes || conf.btn.ok;
-					dialog.no = dialog.no || conf.btn.cancel;
-					break;
-					
-				case "yesno":
-					dialog.yes = dialog.yes || conf.btn.yes;
-					dialog.no = dialog.no || conf.btn.no;
-					break;
-			}
-			
-			if (!dialog.type) {
-				if (dialog.use == "error") {
-					dialog.type = "danger";
-				} else if (dialog.use) {
-					dialog.type = "primary";
-				} else {
-					dialog.type = "default";
-				}
-			}
-			
+		var init = scope.init = function(dialog) {		
 			dialog.deferred = $q.defer();
 			
 			var promise = dialog.deferred.promise;
@@ -368,21 +357,18 @@ angular.module("ezdialog", ["ngAnimate"])
 				yes: "@",
 				no: "@"
 			},
-			link: function(scope, element, attrs){
-				if (!scope.id) {
-					throw "ezdialog directive requires 'id' attribute";
-				}
-				
-				scope.default = ezdialog.configure;
-				scope.element = element;
-				
+			link: function(scope, element, attrs) {
+				scope.default = ezdialog.conf;
+
 				if (attrs.backdropToggle === undefined) {
 					scope.backdropToggle = false;
 				} else {
 					scope.backdropToggle = true;
 				}
 				
-				if (scope.onok) {
+				if (!attrs.onok) {
+					scope.onok = null;
+				} else {
 					scope.onok = function(func){
 						return function(){
 							func({$dialog: scope});
@@ -390,7 +376,9 @@ angular.module("ezdialog", ["ngAnimate"])
 					}(scope.onok);
 				}
 				
-				if (scope.oncancel) {
+				if (!attrs.oncancel) {
+					scope.oncancel = null;
+				} else {
 					scope.oncancel = function(func){
 						return function(){
 							func({$dialog: scope});
@@ -398,7 +386,9 @@ angular.module("ezdialog", ["ngAnimate"])
 					}(scope.oncancel);
 				}
 
-				if (scope.onclose) {
+				if (!attrs.onclose) {
+					scope.onclose = null;
+				} else {
 					scope.onclose = function(func){
 						return function(value){
 							var prevented = false,
@@ -417,9 +407,11 @@ angular.module("ezdialog", ["ngAnimate"])
 				}
 				
 				ezdialog.init(scope);
+			
+				scope.element = element;
 				
-				element.addClass("modal modal-" + scope.type);
-
+				element.addClass("modal modal-" + (scope.type || scope.default.type[scope.use] || "default"));
+				
 				element.on("click", function(e){
 					if (e.target == this && scope.backdropToggle) {
 						scope.$apply(function(){
@@ -451,12 +443,12 @@ angular.module('ezdialog').run(['$templateCache', function($templateCache) {
   'use strict';
 
   $templateCache.put('templates/ezdialog.html',
-    "<div class=\"modal-dialog\" ng-class=\"'modal-' + (size || default.size)\" tabindex=\"-1\" role=\"dialog\"><div class=\"modal-content\"><form role=\"form\" name=\"form\"><div class=\"modal-header\"><button class=\"close\" ng-click=\"close()\">&times; <span class=\"sr-only\">Close dialog</span></button><h4 class=\"modal-title\">{{title || default.title[type]}}</h4></div><div class=\"modal-body\" ng-transclude></div><div class=\"modal-footer\"><button class=\"btn\" ng-class=\"'btn-' + type\" ng-click=\"ok()\" type=\"submit\" ng-if=\"yes!==undefined\" ng-disabled=\"form.$invalid\">{{yes}}</button> <button class=\"btn btn-default\" ng-click=\"cancel()\" type=\"button\" ng-if=\"no!==undefined\">{{no}}</button></div></form></div></div>"
+    "<div class=\"modal-dialog\" ng-class=\"'modal-' + (size || default.size)\" tabindex=\"-1\" role=\"dialog\"><div class=\"modal-content\"><form role=\"form\" name=\"form\"><div class=\"modal-header\"><button class=\"close\" ng-click=\"cancel()\">&times; <span class=\"sr-only\">Close dialog</span></button><h4 class=\"modal-title\">{{title || default.title[use]}}</h4></div><div class=\"modal-body\" ng-transclude></div><div class=\"modal-footer\"><button class=\"btn\" ng-class=\"'btn-' + (type || default.type[use])\" ng-click=\"ok()\" type=\"submit\" ng-if=\"yes !== undefined || !!default.btn[use].yes\" ng-disabled=\"form.$invalid\">{{yes || default.btn[use].yes}}</button> <button class=\"btn btn-default\" ng-click=\"cancel()\" type=\"button\" ng-if=\"no !== undefined || !!default.btn[use].no\">{{no || default.btn[use].no}}</button></div></form></div></div>"
   );
 
 
   $templateCache.put('templates/ezdialogStack.html',
-    "<div class=\"modal-backdrop in\" ng-style=\"{'z-index': getBackdropZ()}\" ng-if=\"dialogs.length\" ng-destroy=\"backdropCleanup()\"></div><div class=\"modal show\" ng-class=\"'modal-' + (dialog.type || 'default')\" ng-repeat=\"dialog in dialogs | filter:{isDialog:true}\" ng-style=\"{'z-index': dialog.zIndex}\" ng-click=\"backdropToggle(dialog)\" ezdialog-bind-element=\"dialog\"><div class=\"modal-dialog\" ng-class=\"'modal-' + (dialog.size || default.size)\" tabindex=\"-1\" role=\"dialog\"><div class=\"modal-content\"><form role=\"form\" name=\"form\"><div class=\"modal-header\"><button class=\"close\" ng-click=\"dialog.close()\">&times; <span class=\"sr-only\">Close dialog</span></button><h4 class=\"modal-title\">{{dialog.title || default.title[dialog.use]}}</h4></div><div class=\"modal-body\"><span style=\"white-space: pre-wrap\" ng-if=\"!dialog.template && !dialog.loaded\">{{dialog.msg || default.msg[dialog.use]}}</span> <span style=\"white-space: pre-wrap\" ng-if=\"dialog.template && !dialog.loaded\">{{dialog.error || dialog.msg}}</span><div ezdialog-copy-scope ng-if=\"dialog.template\" ng-include=\"dialog.template\"></div></div><div class=\"modal-footer\"><button class=\"btn\" ng-class=\"'btn-' + (dialog.type || 'default')\" ng-click=\"dialog.ok()\" ng-if=\"dialog.yes !== undefined\" ng-disabled=\"form.$invalid\">{{dialog.yes}}</button> <button class=\"btn btn-default\" ng-click=\"dialog.cancel()\" type=\"button\" ng-if=\"dialog.no !== undefined\">{{dialog.no}}</button></div></form></div></div></div>"
+    "<div class=\"modal-backdrop in\" ng-style=\"{'z-index': getBackdropZ()}\" ng-if=\"dialogs.length\" ng-destroy=\"backdropCleanup()\"></div><div class=\"modal show\" ng-class=\"'modal-' + (dialog.type || default.type[dialog.use] || 'default')\" ng-repeat=\"dialog in dialogs | filter:{isDialog:true}\" ng-style=\"{'z-index': dialog.zIndex}\" ng-click=\"backdropToggle(dialog)\" ezdialog-bind-element=\"dialog\"><div class=\"modal-dialog\" ng-class=\"'modal-' + (dialog.size || default.size)\" tabindex=\"-1\" role=\"dialog\"><div class=\"modal-content\"><form role=\"form\" name=\"form\"><div class=\"modal-header\"><button class=\"close\" ng-click=\"dialog.cancel()\">&times; <span class=\"sr-only\">Close dialog</span></button><h4 class=\"modal-title\">{{dialog.title || default.title[dialog.use]}}</h4></div><div class=\"modal-body\"><span style=\"white-space: pre-wrap\" ng-if=\"!dialog.template && !dialog.loaded\">{{dialog.msg || default.msg[dialog.use]}}</span> <span style=\"white-space: pre-wrap\" ng-if=\"dialog.template && !dialog.loaded\">{{dialog.error || dialog.msg}}</span><div ezdialog-copy-scope ng-if=\"dialog.template\" ng-include=\"dialog.template\"></div></div><div class=\"modal-footer\"><button class=\"btn\" ng-class=\"'btn-' + (dialog.type || default.type[dialog.use] || 'default')\" ng-click=\"dialog.ok()\" ng-if=\"dialog.yes !== undefined || !!default.btn[dialog.use].yes\" ng-disabled=\"form.$invalid\">{{dialog.yes || default.btn[dialog.use].yes}}</button> <button class=\"btn btn-default\" ng-click=\"dialog.cancel()\" type=\"button\" ng-if=\"dialog.no !== undefined || !!default.btn[dialog.use].no\">{{dialog.no || default.btn[dialog.use].no}}</button></div></form></div></div></div>"
   );
 
 }]);

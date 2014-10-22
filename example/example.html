@@ -68,9 +68,21 @@
 		
 		<h3>Use ezdialog directive</h3>
 		<button class="btn btn-default" ezdialog-toggle="my-dialog">Toggle dialog</button>
-		<div ezdialog="my-dialog" ezdialog-title="Ezdialog directive" size="md" type="warning" onok="dialog.show('Use $dialog.close() to close dialog manually.') && $dialog.close()" oncancel="dialog.show('cancel')" yes="YEEES" no="NOOOO" backdrop-toggle>
+		<button class="btn btn-default" ezdialog-toggle="confirm">Confirm</button>
+		<button class="btn btn-default" ezdialog-toggle="yesno">Yes/No</button>
+		<button class="btn btn-default" ezdialog-toggle="error">Error</button>
+		<div ezdialog="my-dialog" ezdialog-title="Ezdialog directive" size="md" type="success" onok="dialog.show('Use $dialog.close() to close dialog manually.') && $dialog.close()" oncancel="dialog.show('cancel')" yes="YEEES" no="NOOOO" backdrop-toggle>
 			<pre>$scope.number = {{number}}<br>$scope.input.number = {{input.number}}<br>$parent.dialog.scope = {{dialog.scope|json}}</pre>
 			<input type="text" class="form-control" ng-model="number" required>
+		</div>
+		<div ezdialog="confirm" use="confirm">
+			Confirm
+		</div>
+		<div ezdialog="yesno" use="yesno">
+			Yes/No
+		</div>
+		<div ezdialog="error" use="error">
+			Error
 		</div>
 		
 	</div>

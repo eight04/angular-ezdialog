@@ -174,17 +174,27 @@ angular.module("ezdialog", ["ngAnimate"])
 
 		var scope = {};
 		
-		var conf = scope.conf = {
+		scope.conf = {
 			btn: {
-				ok: "OK",
-				cancel: "Cancel",
-				yes: "Yes",
-				no: "No"
+				show: {
+					yes: "OK"
+				},
+				confirm: {
+					yes: "OK",
+					no: "Cancel"
+				},
+				yesno: {
+					yes: "Yes",
+					no: "No"
+				},
+				error: {
+					yes: "OK"
+				}
 			},
 			title: {
 				show: "Info",
 				confirm: "Confirm",
-				yesno: "Confirm",
+				yesno: "Question",
 				error: "Error"
 			},
 			msg: {
@@ -193,38 +203,17 @@ angular.module("ezdialog", ["ngAnimate"])
 				yesno: "Yes or no?",
 				error: "An error occurred!"
 			},
+			type: {
+				show: "info",
+				confirm: "primary",
+				yesno: "warning",
+				error: "danger"
+			},
 			size: "sm",
 			toggleBackdrop: false
 		};
 		
-		var init = scope.init = function(dialog) {
-			switch (dialog.use) {
-				case "show":
-				case "error":
-					dialog.yes = dialog.yes || conf.btn.ok;
-					break;
-					
-				case "confirm":
-					dialog.yes = dialog.yes || conf.btn.ok;
-					dialog.no = dialog.no || conf.btn.cancel;
-					break;
-					
-				case "yesno":
-					dialog.yes = dialog.yes || conf.btn.yes;
-					dialog.no = dialog.no || conf.btn.no;
-					break;
-			}
-			
-			if (!dialog.type) {
-				if (dialog.use == "error") {
-					dialog.type = "danger";
-				} else if (dialog.use) {
-					dialog.type = "primary";
-				} else {
-					dialog.type = "default";
-				}
-			}
-			
+		var init = scope.init = function(dialog) {		
 			dialog.deferred = $q.defer();
 			
 			var promise = dialog.deferred.promise;
@@ -368,21 +357,18 @@ angular.module("ezdialog", ["ngAnimate"])
 				yes: "@",
 				no: "@"
 			},
-			link: function(scope, element, attrs){
-				if (!scope.id) {
-					throw "ezdialog directive requires 'id' attribute";
-				}
-				
-				scope.default = ezdialog.configure;
-				scope.element = element;
-				
+			link: function(scope, element, attrs) {
+				scope.default = ezdialog.conf;
+
 				if (attrs.backdropToggle === undefined) {
 					scope.backdropToggle = false;
 				} else {
 					scope.backdropToggle = true;
 				}
 				
-				if (scope.onok) {
+				if (!attrs.onok) {
+					scope.onok = null;
+				} else {
 					scope.onok = function(func){
 						return function(){
 							func({$dialog: scope});
@@ -390,7 +376,9 @@ angular.module("ezdialog", ["ngAnimate"])
 					}(scope.onok);
 				}
 				
-				if (scope.oncancel) {
+				if (!attrs.oncancel) {
+					scope.oncancel = null;
+				} else {
 					scope.oncancel = function(func){
 						return function(){
 							func({$dialog: scope});
@@ -398,7 +386,9 @@ angular.module("ezdialog", ["ngAnimate"])
 					}(scope.oncancel);
 				}
 
-				if (scope.onclose) {
+				if (!attrs.onclose) {
+					scope.onclose = null;
+				} else {
 					scope.onclose = function(func){
 						return function(value){
 							var prevented = false,
@@ -417,9 +407,11 @@ angular.module("ezdialog", ["ngAnimate"])
 				}
 				
 				ezdialog.init(scope);
+			
+				scope.element = element;
 				
-				element.addClass("modal modal-" + scope.type);
-
+				element.addClass("modal modal-" + (scope.type || scope.default.type[scope.use] || "default"));
+				
 				element.on("click", function(e){
 					if (e.target == this && scope.backdropToggle) {
 						scope.$apply(function(){

@@ -1,10 +1,10 @@
 <div class="modal-backdrop in" ng-style="{'z-index': getBackdropZ()}" ng-if="dialogs.length" ng-destroy="backdropCleanup()"></div>
-<div class="modal show" ng-class="'modal-' + (dialog.type || 'default')" ng-repeat="dialog in dialogs | filter:{isDialog:true}" ng-style="{'z-index': dialog.zIndex}" ng-click="backdropToggle(dialog)" ezdialog-bind-element="dialog"><!--
+<div class="modal show" ng-class="'modal-' + (dialog.type || default.type[dialog.use] || 'default')" ng-repeat="dialog in dialogs | filter:{isDialog:true}" ng-style="{'z-index': dialog.zIndex}" ng-click="backdropToggle(dialog)" ezdialog-bind-element="dialog"><!--
 	--><div class="modal-dialog" ng-class="'modal-' + (dialog.size || default.size)" tabindex="-1" role="dialog">
 		<div class="modal-content">
 			<form role="form" name="form">
 				<div class="modal-header">
-					<button class="close" ng-click="dialog.close()">
+					<button class="close" ng-click="dialog.cancel()">
 						&times;
 						<span class="sr-only">Close dialog</span>
 					</button>
@@ -16,8 +16,8 @@
 					<div ezdialog-copy-scope ng-if="dialog.template" ng-include="dialog.template"></div>
 				</div>
 				<div class="modal-footer">
-					<button class="btn" ng-class="'btn-' + (dialog.type || 'default')" ng-click="dialog.ok()" ng-if="dialog.yes !== undefined" ng-disabled="form.$invalid">{{dialog.yes}}</button>
-					<button class="btn btn-default" ng-click="dialog.cancel()" type="button" ng-if="dialog.no !== undefined">{{dialog.no}}</button>
+					<button class="btn" ng-class="'btn-' + (dialog.type || default.type[dialog.use] || 'default')" ng-click="dialog.ok()" ng-if="dialog.yes !== undefined || !!default.btn[dialog.use].yes" ng-disabled="form.$invalid">{{dialog.yes || default.btn[dialog.use].yes}}</button>
+					<button class="btn btn-default" ng-click="dialog.cancel()" type="button" ng-if="dialog.no !== undefined || !!default.btn[dialog.use].no">{{dialog.no || default.btn[dialog.use].no}}</button>
 				</div>
 			</form>
 		</div>
