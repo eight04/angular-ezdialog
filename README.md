@@ -135,3 +135,4 @@ Todos
 * Support httpRequest loading message on ng-include.
 * Support $q deferred.reject.
 * Add custom controller.
+* Add waiting dialog. Combine with http?
